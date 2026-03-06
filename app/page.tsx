@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Printer, Wifi, Upload, FileText, X, Settings, Save, Loader2, Info } from "lucide-react";
 import Papa from "papaparse";
 import { useDropzone } from "react-dropzone";
-import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 
 // Types
