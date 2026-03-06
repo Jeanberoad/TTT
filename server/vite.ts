@@ -12,7 +12,7 @@ export async function setupVite(httpServer: Server, app: Express) {
     server: {
       middlewareMode: true,
       hmr: { server: httpServer },
-      allowedHosts: "all",
+      allowedHosts: true,
     },
     appType: "spa",
     resolve: {
