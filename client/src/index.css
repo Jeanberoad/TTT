@@ -117,6 +117,12 @@
     background-color: white !important;
     color: #0f172a !important;
   }
+  .ticket-card-content img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    -webkit-print-color-adjust: exact !important;
+  }
   .ticket-text-muted {
     color: #64748b !important;
   }
