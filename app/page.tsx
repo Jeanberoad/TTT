@@ -5,6 +5,7 @@ import { Printer, Wifi, Upload, FileText, X, Settings, Save, Loader2, Info } fro
 import Papa from "papaparse";
 import { useDropzone } from "react-dropzone";
 import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 // Types
 interface TicketData {
