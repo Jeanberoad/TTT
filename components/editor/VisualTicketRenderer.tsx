@@ -23,6 +23,12 @@ export function VisualTicketRenderer({
   qrUrl,
   scale = 1,
 }: VisualTicketRendererProps) {
+  console.log("[v0] VisualTicketRenderer rendering with:", {
+    templateId: template?.id,
+    qrUrl,
+    elements: template?.elements?.map(e => ({ id: e.id, type: e.type, visible: e.visible }))
+  });
+
   // Get display content for dynamic elements
   const getContent = (element: TicketElement): string => {
     switch (element.type) {
@@ -267,6 +273,7 @@ export function VisualTicketRenderer({
 
     // QR Code element
     if (element.type === "qrcode") {
+      console.log("[v0] Rendering QR code element:", { elementId: element.id, qrUrl, containerStyles });
       return (
         <div key={element.id} style={elementContainerStyle}>
           <div
@@ -289,6 +296,8 @@ export function VisualTicketRenderer({
                 objectFit: "contain",
               }}
               crossOrigin="anonymous"
+              onError={(e) => console.log("[v0] QR image failed to load:", e)}
+              onLoad={() => console.log("[v0] QR image loaded successfully")}
             />
           </div>
         </div>

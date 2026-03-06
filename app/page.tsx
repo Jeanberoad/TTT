@@ -797,6 +797,12 @@ function HorizontalTicket({ ticket, config, qrUrl }: { ticket: TicketData; confi
 
 function TicketCard({ ticket, config }: { ticket: TicketData; config: Configuration }) {
   const qrUrl = getQrUrl(ticket, config);
+  
+  console.log("[v0] TicketCard rendering:", { 
+    template: config.template, 
+    qrUrl,
+    builtInTemplateFound: builtInTemplates.find(t => t.id === config.template)?.id
+  });
 
   // Check if using a visual template from the editor
   if (config.template.startsWith("visual-") && config.visualTemplate) {
