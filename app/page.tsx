@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Printer, Wifi, Upload, FileText, X, Settings, Save, Loader2, Info } from "lucide-react";
+import { Printer, Wifi, Upload, FileText, X, Settings, Save, Loader2, Info, Palette } from "lucide-react";
+import Link from "next/link";
 import Papa from "papaparse";
 import { useDropzone } from "react-dropzone";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { VisualTicketRenderer } from "@/components/editor/VisualTicketRenderer";
+import { TicketTemplate } from "@/lib/editor-types";
+import { builtInTemplates } from "@/lib/templates";
 
 // Types
 interface TicketData {
@@ -35,6 +39,7 @@ interface Configuration {
   fontSize: number;
   ticketWidth: number;
   ticketHeight: number;
+  visualTemplate?: TicketTemplate;
 }
 
 const defaultConfig: Configuration = {
@@ -323,12 +328,20 @@ function ConfigPanel({ config, onConfigChange }: { config: Configuration; onConf
                 onChange={handleChange}
                 className="w-full px-3 py-2 bg-background border rounded-lg text-sm"
               >
-                <option value="modern">Modern</option>
-                <option value="minimalist">Minimalist</option>
-                <option value="premium">Premium</option>
-                <option value="black_white">Black & White</option>
-                <option value="horizontal">Horizontal</option>
-              </select>
+<optgroup label="Classiques">
+    <option value="modern">Modern</option>
+    <option value="minimalist">Minimalist</option>
+    <option value="premium">Premium</option>
+    <option value="black_white">Black & White</option>
+    <option value="horizontal">Horizontal</option>
+  </optgroup>
+  <optgroup label="Templates Visuels">
+    <option value="premium-dark">Premium Dark</option>
+    <option value="modern-clean">Modern Clean</option>
+    <option value="ocean-blue">Ocean Blue</option>
+    <option value="sunset-warm">Sunset Warm</option>
+  </optgroup>
+  </select>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-foreground">QR Style</label>
@@ -452,14 +465,22 @@ function ConfigPanel({ config, onConfigChange }: { config: Configuration; onConf
           disabled={isSaving}
           className="w-full mt-4 py-2.5 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl shadow-md shadow-primary/20 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
         >
-          {isSaving ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Save className="w-4 h-4" />
-          )}
-          Save Configuration
-        </button>
-      </form>
+{isSaving ? (
+  <Loader2 className="w-4 h-4 animate-spin" />
+  ) : (
+  <Save className="w-4 h-4" />
+  )}
+  Save Configuration
+  </button>
+  
+  <Link
+    href="/editor"
+    className="w-full py-2.5 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg hover:from-violet-700 hover:to-indigo-700 transition-all font-medium flex items-center justify-center gap-2"
+  >
+    <Palette className="w-4 h-4" />
+    Editeur visuel de templates
+  </Link>
+  </form>
     </div>
   );
 }
@@ -777,6 +798,31 @@ function HorizontalTicket({ ticket, config, qrUrl }: { ticket: TicketData; confi
 function TicketCard({ ticket, config }: { ticket: TicketData; config: Configuration }) {
   const qrUrl = getQrUrl(ticket, config);
 
+  // Check if using a visual template from the editor
+  if (config.template.startsWith("visual-") && config.visualTemplate) {
+    return (
+      <VisualTicketRenderer
+        template={config.visualTemplate}
+        ticket={ticket}
+        qrUrl={qrUrl}
+        scale={1}
+      />
+    );
+  }
+
+  // Check if using a built-in visual template
+  const builtInTemplate = builtInTemplates.find(t => t.id === config.template);
+  if (builtInTemplate) {
+    return (
+      <VisualTicketRenderer
+        template={builtInTemplate}
+        ticket={ticket}
+        qrUrl={qrUrl}
+        scale={1}
+      />
+    );
+  }
+
   switch (config.template) {
     case "minimalist":
       return <MinimalistTicket ticket={ticket} config={config} qrUrl={qrUrl} />;
@@ -836,13 +882,20 @@ export default function Home() {
               <p className="text-xs text-muted-foreground">Generate stylized hotspot access tickets</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {tickets.length > 0 && (
-              <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                {tickets.length} tickets
-              </span>
-            )}
-            <button
+<div className="flex items-center gap-2">
+  <Link
+    href="/editor"
+    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg hover:from-violet-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg font-medium text-sm"
+  >
+    <Palette className="w-4 h-4" />
+    <span>Editeur visuel</span>
+  </Link>
+  {tickets.length > 0 && (
+  <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
+  {tickets.length} tickets
+  </span>
+  )}
+  <button
               onClick={handlePrint}
               disabled={tickets.length === 0}
               className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl font-medium text-sm shadow-sm hover:bg-primary/90 transition-all disabled:opacity-40 disabled:pointer-events-none"

@@ -356,7 +356,7 @@ export const premiumDarkTemplate: TicketTemplate = {
 export const modernCleanTemplate: TicketTemplate = {
   id: 'modern-clean',
   name: 'Modern Clean',
-  description: 'Clean and modern design with subtle gradients',
+  description: 'Clean and modern design with premium background',
   dimensions: {
     width: 85,
     height: 55,
@@ -366,13 +366,13 @@ export const modernCleanTemplate: TicketTemplate = {
     borderOpacity: 0,
   },
   background: {
-    type: 'gradient',
+    type: 'image',
     color: '#667eea',
-    gradientFrom: '#667eea',
-    gradientTo: '#764ba2',
-    gradientAngle: 135,
+    imageUrl: '/images/modern-bg.jpg',
     imageFit: 'cover',
     imageOpacity: 1,
+    overlayColor: '#000000',
+    overlayOpacity: 0.2,
   },
   elements: [
     {
@@ -592,7 +592,7 @@ export const minimalistTemplate: TicketTemplate = {
 export const oceanBlueTemplate: TicketTemplate = {
   id: 'ocean-blue',
   name: 'Ocean Blue',
-  description: 'Calming ocean-inspired blue theme',
+  description: 'Calming ocean-inspired blue theme with premium background',
   dimensions: {
     width: 85,
     height: 60,
@@ -602,13 +602,13 @@ export const oceanBlueTemplate: TicketTemplate = {
     borderOpacity: 0.5,
   },
   background: {
-    type: 'gradient',
+    type: 'image',
     color: '#0c4a6e',
-    gradientFrom: '#0c4a6e',
-    gradientTo: '#075985',
-    gradientAngle: 180,
+    imageUrl: '/images/ocean-bg.jpg',
     imageFit: 'cover',
     imageOpacity: 1,
+    overlayColor: '#0c4a6e',
+    overlayOpacity: 0.3,
     pattern: 'waves',
     patternOpacity: 0.1,
   },
@@ -792,7 +792,7 @@ export const oceanBlueTemplate: TicketTemplate = {
 export const sunsetWarmTemplate: TicketTemplate = {
   id: 'sunset-warm',
   name: 'Sunset Warm',
-  description: 'Warm sunset gradient with modern typography',
+  description: 'Warm sunset gradient with premium background',
   dimensions: {
     width: 90,
     height: 55,
@@ -802,13 +802,13 @@ export const sunsetWarmTemplate: TicketTemplate = {
     borderOpacity: 0,
   },
   background: {
-    type: 'gradient',
+    type: 'image',
     color: '#f97316',
-    gradientFrom: '#dc2626',
-    gradientTo: '#f97316',
-    gradientAngle: 45,
+    imageUrl: '/images/sunset-bg.jpg',
     imageFit: 'cover',
     imageOpacity: 1,
+    overlayColor: '#dc2626',
+    overlayOpacity: 0.15,
   },
   elements: [
     {

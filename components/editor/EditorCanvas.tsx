@@ -3,7 +3,16 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { TicketTemplate, TicketElement, generateId } from "@/lib/editor-types";
 import { DraggableElement } from "./DraggableElement";
-import { ZoomIn, ZoomOut, Grid3X3, RotateCcw } from "lucide-react";
+import { ZoomIn, ZoomOut, Grid3X3, RotateCcw, Maximize2 } from "lucide-react";
+
+// Preset sizes for tickets (in mm)
+const PRESET_SIZES = [
+  { name: "Carte de visite", width: 85, height: 55 },
+  { name: "Petit", width: 70, height: 45 },
+  { name: "Standard", width: 90, height: 60 },
+  { name: "Grand", width: 100, height: 70 },
+  { name: "Large", width: 120, height: 80 },
+];
 
 interface EditorCanvasProps {
   template: TicketTemplate;
@@ -33,9 +42,14 @@ export function EditorCanvas({
   previewData,
 }: EditorCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(1);
   const [showGrid, setShowGrid] = useState(false);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeDirection, setResizeDirection] = useState<string | null>(null);
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [showSizePresets, setShowSizePresets] = useState(false);
 
   // Calculate canvas size based on template dimensions
   useEffect(() => {
@@ -70,6 +84,77 @@ export function EditorCanvas({
       onSelectElement(null);
     }
   }, [onSelectElement]);
+
+  // Handle canvas resize start
+  const handleResizeStart = useCallback((e: React.PointerEvent, direction: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    setResizeDirection(direction);
+    setResizeStart({
+      x: e.clientX,
+      y: e.clientY,
+      width: template.dimensions.width,
+      height: template.dimensions.height,
+    });
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [template.dimensions]);
+
+  // Handle canvas resize move
+  const handleResizeMove = useCallback((e: React.PointerEvent) => {
+    if (!isResizing || !resizeDirection) return;
+    
+    const container = containerRef.current;
+    if (!container) return;
+    
+    // Convert pixel movement to mm (rough approximation based on zoom and display)
+    const scale = 3.78 * zoom; // approx pixels per mm at current zoom
+    const deltaX = (e.clientX - resizeStart.x) / scale;
+    const deltaY = (e.clientY - resizeStart.y) / scale;
+    
+    let newWidth = resizeStart.width;
+    let newHeight = resizeStart.height;
+    
+    if (resizeDirection.includes('e')) {
+      newWidth = Math.max(40, Math.min(150, resizeStart.width + deltaX));
+    }
+    if (resizeDirection.includes('w')) {
+      newWidth = Math.max(40, Math.min(150, resizeStart.width - deltaX));
+    }
+    if (resizeDirection.includes('s')) {
+      newHeight = Math.max(30, Math.min(120, resizeStart.height + deltaY));
+    }
+    if (resizeDirection.includes('n')) {
+      newHeight = Math.max(30, Math.min(120, resizeStart.height - deltaY));
+    }
+    
+    onUpdateTemplate({
+      dimensions: {
+        ...template.dimensions,
+        width: Math.round(newWidth),
+        height: Math.round(newHeight),
+      },
+    });
+  }, [isResizing, resizeDirection, resizeStart, zoom, template.dimensions, onUpdateTemplate]);
+
+  // Handle canvas resize end
+  const handleResizeEnd = useCallback((e: React.PointerEvent) => {
+    setIsResizing(false);
+    setResizeDirection(null);
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+  }, []);
+
+  // Apply preset size
+  const applyPresetSize = useCallback((preset: typeof PRESET_SIZES[0]) => {
+    onUpdateTemplate({
+      dimensions: {
+        ...template.dimensions,
+        width: preset.width,
+        height: preset.height,
+      },
+    });
+    setShowSizePresets(false);
+  }, [template.dimensions, onUpdateTemplate]);
 
   // Render background based on template settings
   const renderBackground = () => {
@@ -195,10 +280,39 @@ export function EditorCanvas({
     <div className="flex-1 flex flex-col bg-gray-100 dark:bg-gray-900 overflow-hidden">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-            {template.dimensions.width}mm x {template.dimensions.height}mm
-          </span>
+        <div className="flex items-center gap-2 relative">
+          <button
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            onClick={() => setShowSizePresets(!showSizePresets)}
+          >
+            <Maximize2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {template.dimensions.width}mm x {template.dimensions.height}mm
+            </span>
+          </button>
+          
+          {/* Size presets dropdown */}
+          {showSizePresets && (
+            <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 py-1">
+              {PRESET_SIZES.map((preset) => (
+                <button
+                  key={preset.name}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex justify-between items-center"
+                  onClick={() => applyPresetSize(preset)}
+                >
+                  <span className="text-gray-700 dark:text-gray-300">{preset.name}</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-xs">
+                    {preset.width}x{preset.height}mm
+                  </span>
+                </button>
+              ))}
+              <div className="border-t border-gray-200 dark:border-gray-700 mt-1 pt-1 px-3 py-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Glissez les bords du ticket pour ajuster la taille
+                </p>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -243,20 +357,22 @@ export function EditorCanvas({
       </div>
 
       {/* Canvas Container */}
-      <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
-        <div
-          ref={canvasRef}
-          className="relative shadow-2xl transition-all duration-200"
-          style={{
-            width: canvasSize.width,
-            height: canvasSize.height,
-            borderRadius: `${template.dimensions.borderRadius}px`,
-            borderWidth: template.dimensions.borderWidth,
-            borderStyle: 'solid',
-            borderColor: `${template.dimensions.borderColor}${Math.round((template.dimensions.borderOpacity || 1) * 255).toString(16).padStart(2, '0')}`,
-          }}
-          onClick={handleCanvasClick}
-        >
+      <div ref={containerRef} className="flex-1 flex items-center justify-center p-6 overflow-auto">
+        <div className="relative">
+          {/* The main canvas */}
+          <div
+            ref={canvasRef}
+            className="relative shadow-2xl transition-all duration-200"
+            style={{
+              width: canvasSize.width,
+              height: canvasSize.height,
+              borderRadius: `${template.dimensions.borderRadius}px`,
+              borderWidth: template.dimensions.borderWidth,
+              borderStyle: 'solid',
+              borderColor: `${template.dimensions.borderColor}${Math.round((template.dimensions.borderOpacity || 1) * 255).toString(16).padStart(2, '0')}`,
+            }}
+            onClick={handleCanvasClick}
+          >
           {/* Background */}
           {renderBackground()}
           
@@ -299,6 +415,44 @@ export function EditorCanvas({
                 previewData={previewData}
               />
             ))}
+          </div>
+
+          {/* Resize handles for canvas */}
+          {/* Right edge */}
+          <div
+            className="absolute top-1/2 -right-3 w-2 h-12 -translate-y-1/2 bg-blue-500 rounded-full cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity"
+            onPointerDown={(e) => handleResizeStart(e, 'e')}
+            onPointerMove={handleResizeMove}
+            onPointerUp={handleResizeEnd}
+          />
+          {/* Bottom edge */}
+          <div
+            className="absolute -bottom-3 left-1/2 w-12 h-2 -translate-x-1/2 bg-blue-500 rounded-full cursor-ns-resize opacity-0 hover:opacity-100 transition-opacity"
+            onPointerDown={(e) => handleResizeStart(e, 's')}
+            onPointerMove={handleResizeMove}
+            onPointerUp={handleResizeEnd}
+          />
+          {/* Bottom-right corner */}
+          <div
+            className="absolute -bottom-3 -right-3 w-4 h-4 bg-blue-500 rounded-full cursor-nwse-resize opacity-0 hover:opacity-100 transition-opacity"
+            onPointerDown={(e) => handleResizeStart(e, 'se')}
+            onPointerMove={handleResizeMove}
+            onPointerUp={handleResizeEnd}
+          />
+          {/* Left edge */}
+          <div
+            className="absolute top-1/2 -left-3 w-2 h-12 -translate-y-1/2 bg-blue-500 rounded-full cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity"
+            onPointerDown={(e) => handleResizeStart(e, 'w')}
+            onPointerMove={handleResizeMove}
+            onPointerUp={handleResizeEnd}
+          />
+          {/* Top edge */}
+          <div
+            className="absolute -top-3 left-1/2 w-12 h-2 -translate-x-1/2 bg-blue-500 rounded-full cursor-ns-resize opacity-0 hover:opacity-100 transition-opacity"
+            onPointerDown={(e) => handleResizeStart(e, 'n')}
+            onPointerMove={handleResizeMove}
+            onPointerUp={handleResizeEnd}
+          />
         </div>
       </div>
     </div>
