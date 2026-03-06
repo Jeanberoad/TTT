@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx server/index.ts",
-    "build": "tsx script/build.ts",
+    "dev": "node_modules/.bin/tsx server/index.ts",
+    "build": "node_modules/.bin/tsx script/build.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
-    "db:push": "drizzle-kit push"
+    "db:push": "node_modules/.bin/drizzle-kit push"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.0",
