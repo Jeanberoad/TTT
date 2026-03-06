@@ -209,6 +209,7 @@ export function ConfigPanel() {
                 <option value="modern">Modern</option>
                 <option value="minimalist">Minimalist</option>
                 <option value="premium">Premium</option>
+                <option value="black_white">Black & White</option>
                 <option value="horizontal">Horizontal</option>
               </select>
             </div>
