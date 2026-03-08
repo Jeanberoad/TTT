@@ -11,6 +11,8 @@
     --error-bg: rgba(255, 68, 68, 0.1);
     --error-text: #ff4444;
     --glass-border: rgba(255, 255, 255, 0.1);
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
@@ -102,15 +104,17 @@ body::before {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 40px;
+    border-radius: 28px;
+    padding: 48px;
     width: calc(100% - 40px);
-    max-width: 400px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                0 0 20px rgba(138, 43, 226, 0.2);
+    max-width: 420px;
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(138, 43, 226, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
     margin: 60px auto;
     position: relative;
     z-index: 1;
+    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 table {
@@ -167,22 +171,25 @@ table td:last-child {
 
 .header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
 }
 
 .header h1 {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 800;
-    margin-bottom: 8px;
-    background: linear-gradient(to right, var(--accent-secondary), var(--accent-primary), var(--accent-tertiary));
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary), var(--accent-tertiary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.5px;
+    animation: fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header p {
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
 }
 
 .input-group {
@@ -193,66 +200,82 @@ table td:last-child {
 .input-group input {
     width: 100%;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 14px 16px;
+    border: 1.5px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 16px 18px;
     color: white;
     font-size: 16px;
-    transition: all 0.3s ease;
+    font-weight: 500;
+    transition: all var(--transition-smooth);
     outline: none;
 }
 
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
 .input-group input:focus {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
     border-color: var(--accent-primary);
-    box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-submit {
     width: 100%;
-    background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     border: none;
-    border-radius: 12px;
-    padding: 14px;
+    border-radius: 14px;
+    padding: 16px;
     color: white;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    margin-top: 10px;
+    transition: all var(--transition-smooth);
+    margin-top: 20px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
+    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.35);
 }
 
 .btn-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(138, 43, 226, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(138, 43, 226, 0.5);
+}
+
+.btn-submit:active {
+    transform: translateY(-1px);
 }
 
 .btn-qr {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 12px;
+    background: rgba(0, 206, 209, 0.1);
+    border: 1.5px solid var(--accent-secondary);
+    border-radius: 14px;
+    padding: 14px;
     color: var(--accent-secondary);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
-    margin-top: 15px;
+    transition: all var(--transition-smooth);
+    margin-top: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
 }
 
 .btn-qr:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--accent-secondary);
     border-color: var(--accent-secondary);
     color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 206, 209, 0.3);
+}
+
+.btn-qr:active {
+    transform: translateY(0);
 }
 
 .qr-icon {
@@ -277,12 +300,14 @@ table td:last-child {
 .error-msg {
     background: var(--error-bg);
     color: var(--error-text);
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 13px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
     margin-bottom: 20px;
     text-align: center;
-    border: 1px solid rgba(255, 68, 68, 0.2);
+    border: 1.5px solid rgba(255, 68, 68, 0.3);
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .price-section {
@@ -302,21 +327,26 @@ table td:last-child {
 
 .price-card {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
+    border: 1.5px solid var(--glass-border);
     border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 15px;
+    padding: 22px 24px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-smooth);
 }
 
 .price-card:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
     border-color: var(--accent-secondary);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 206, 209, 0.2);
+}
+
+.price-card:active {
+    transform: translateY(-1px);
 }
 
 .copy-container {
@@ -335,19 +365,21 @@ table td:last-child {
 .btn-copy {
     width: 100%;
     background: rgba(0, 206, 209, 0.1);
-    border: 1px solid var(--accent-secondary);
+    border: 1.5px solid var(--accent-secondary);
     border-radius: 12px;
-    padding: 10px;
+    padding: 12px;
     color: var(--accent-secondary);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-smooth);
 }
 
 .btn-copy:hover {
     background: var(--accent-secondary);
     color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 206, 209, 0.3);
 }
 
 #fallback-url-input {
@@ -403,6 +435,39 @@ table td:last-child {
     border-radius: 14px;
 }
 
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 @media (max-width: 480px) {
     .login-card {
         padding: 30px 20px;
@@ -416,30 +481,38 @@ table td:last-child {
 /* Theme toggle (sun icon) */
 .theme-toggle {
     position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 42px;
-    height: 42px;
-    border: 1px solid var(--glass-border);
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border: 1.5px solid var(--glass-border);
     border-radius: 999px;
-    background: rgba(15, 20, 30, 0.35);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(15, 20, 30, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: grid;
     place-items: center;
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    transition: all var(--transition-smooth);
+}
+.theme-toggle:hover {
+    background: rgba(15, 20, 30, 0.6);
+    border-color: var(--accent-secondary);
+    box-shadow: 0 0 15px rgba(0, 206, 209, 0.3);
 }
 .theme-toggle svg {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     fill: none;
     stroke: var(--text-primary);
     stroke-width: 2;
     opacity: 0.95;
+    transition: transform var(--transition-smooth);
 }
-.theme-toggle:active { transform: scale(0.98); }
+.theme-toggle:hover svg { transform: rotate(20deg); }
+.theme-toggle:active { transform: scale(0.96); }
 
 /* Password eye toggle */
 .password-group {

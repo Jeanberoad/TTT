@@ -56,7 +56,19 @@ python3 -m http.server 5000 --bind 0.0.0.0
 
 Configured as a **static** deployment. The public directory is `.` (root).
 
+## Design Improvements
+
+- **Enhanced animations:** Smooth slide-up, fade-in, and slide-in effects for better visual feedback
+- **Improved buttons:** Better hover/active states with elevated shadows and smooth transitions
+- **Better spacing:** Increased padding and margins for cleaner visual hierarchy
+- **Enhanced inputs:** Larger padding, better focus states with improved glow effects
+- **Better cards:** Improved shadows, hover effects, and interactive feedback
+- **Theme toggle:** Enhanced hover animation with rotating icon
+- **Price cards:** Better visual feedback with color-enhanced hover states
+- **Smoother transitions:** Consistent use of cubic-bezier easing functions
+
 ## Notes
 
 - The MikroTik template tags (e.g., `$(username)`, `$(if error)`) will appear as literal text when previewed in a standard browser — they are processed server-side by the MikroTik router's hotspot engine.
 - The theme changes automatically based on time of day (morning, noon, afternoon, night).
+- All animations and transitions are GPU-accelerated for smooth performance.
