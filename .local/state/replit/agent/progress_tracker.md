@@ -11,3 +11,25 @@
 [x] 11. Refined smartphone frame glow to match login card
 [x] 12. Changed tutorial section background to modern light gradient
 [x] 13. Updated text colors for light background readability
+[x] 14. Improved transition aesthetic between login and tutorial sections
+     - Created smooth gradient transition (300px spacer): dark → white
+     - Ensured pure white background covers entire tutorial section
+     - Added subtle geometric decorative elements (radial gradients) with low opacity (0.03-0.04)
+     - Positioned decorative circles on sides/corners for modern minimalist look
+     - Optimized z-index hierarchy for content visibility
+[x] 15. Enhanced fluidity and mobile compatibility
+     - Improved scroll transition with cubic easing (4.5 viewport heights, smoother progression)
+     - Added decorative radial gradient accents behind smartphone frame (purple & cyan with blur)
+     - Slowed glow animations from 1200ms to 2000ms interval for smoother visual transitions
+     - Increased glow transition duration to 3s for elegant color changes
+     - Fixed iOS video playback: added controls, click/tap handlers, Promises with error catching
+     - Ensured video element is fully interactive on mobile (cursor pointer, -webkit-user-select)
+     - All visual improvements maintain minimalist, modern design aesthetic
+[x] 16. Improved video autoplay and transition visuals
+     - Added autoplay attribute to video element for automatic playback on scroll
+     - Enhanced IntersectionObserver with improved Promise handling and threshold 0.3
+     - Added fallback click handler for iOS/Safari when autoplay is blocked
+     - Expanded tutorial spacer to 350px with 9-step gradient transition
+     - Gradient now has more natural color progression: dark → subtle purple → pale blue → white
+     - Eliminated harsh "black line" effect between sections with progressive fade
+     - Optimized for mobile with smooth, continuous visual flow
