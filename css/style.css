@@ -591,6 +591,8 @@ table td:last-child {
     position: relative;
     z-index: 1;
     pointer-events: none;
+    /* This ensures the transition always tends towards the tutorial section background color */
+    --transition-color: #ffffff;
 }
 
 .tutorial-spacer::before {
@@ -604,15 +606,15 @@ table td:last-child {
     -webkit-backdrop-filter: blur(20px);
     mask-image: linear-gradient(to bottom, 
         transparent 0%, 
-        rgba(0,0,0,0.05) 15%,
-        rgba(0,0,0,0.3) 40%, 
-        rgba(0,0,0,0.8) 75%,
+        rgba(0,0,0,0.02) 10%,
+        rgba(0,0,0,0.2) 35%, 
+        rgba(0,0,0,0.7) 70%,
         black 100%);
     -webkit-mask-image: linear-gradient(to bottom, 
         transparent 0%, 
-        rgba(0,0,0,0.05) 15%,
-        rgba(0,0,0,0.3) 40%, 
-        rgba(0,0,0,0.8) 75%,
+        rgba(0,0,0,0.02) 10%,
+        rgba(0,0,0,0.2) 35%, 
+        rgba(0,0,0,0.7) 70%,
         black 100%);
 }
 
@@ -625,10 +627,10 @@ table td:last-child {
     height: 100%;
     background: linear-gradient(to bottom, 
         transparent 0%, 
-        rgba(5, 7, 10, 0.2) 20%,
-        rgba(5, 7, 10, 0.5) 50%,
-        rgba(5, 7, 10, 0.8) 80%,
-        #ffffff 100%);
+        rgba(255, 255, 255, 0) 10%,
+        rgba(255, 255, 255, 0.4) 40%,
+        rgba(255, 255, 255, 0.8) 75%,
+        var(--transition-color) 100%);
 }
 
 .tutorial-section {
