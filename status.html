@@ -1,63 +1,119 @@
 <html>
 <head>
-<meta http-equiv="refresh" content="5">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />   
+<meta name="viewport" content="width=device-width, initial-scale=1.0">   
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="expires" content="-1">
+
 <title>Statut - WiFi de Tsararano</title>
+
 <link rel="stylesheet" href="css/style.css">
-    <script src="theme.js"></script>
+<script src="theme.js"></script>
+
+<script>
+
+function updateStatus(){
+
+fetch("status-data.html")
+.then(response => response.text())
+.then(data => {
+
+let d = data.split("|");
+
+if(document.getElementById("ip"))
+document.getElementById("ip").innerText = d[4];
+
+if(document.getElementById("bytesIn"))
+document.getElementById("bytesIn").innerText = d[0];
+
+if(document.getElementById("bytesOut"))
+document.getElementById("bytesOut").innerText = d[1];
+
+if(document.getElementById("uptime"))
+document.getElementById("uptime").innerText = d[2];
+
+if(d[3] && document.getElementById("timeleft"))
+document.getElementById("timeleft").innerText = d[3];
+
+});
+
+}
+
+setInterval(updateStatus,5000);
+window.onload = updateStatus;
+
+</script>
+
 <script>
 $(if advert-pending == 'yes')
-    var popup = '';
-    function focusAdvert() {
-        if (window.focus) popup.focus();
-    }
-    function openAdvert() {
-        popup = open('$(link-advert)', 'hotspot_advert', '');
-        setTimeout("focusAdvert()", 1000);
-    }
+var popup = '';
+function focusAdvert() {
+    if (window.focus) popup.focus();
+}
+function openAdvert() {
+    popup = open('$(link-advert)', 'hotspot_advert', '');
+    setTimeout("focusAdvert()", 1000);
+}
 $(endif)
-    function openLogout() {
-        if (window.name != 'hotspot_status') return true;
-        open('$(link-logout)', 'hotspot_logout', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=280,height=250');
-        window.close();
-        return false;
-    }
 </script>
+
 </head>
+
 <body $(if advert-pending == 'yes') onLoad="openAdvert()" $(endif)>
-    <div class="main-card">
-        <div class="header">
-            $(if login-by == 'trial')
-                <h1>Essai gratuit</h1>
-            $(elif login-by != 'mac')
-                <h1>Bonjour, $(username)</h1>
-            $(endif)
-            <p>Vous êtes connecté au WiFi</p>
-        </div>
 
-        <form action="$(link-logout)" name="logout" onSubmit="return openLogout()">
-            <table>
-                <tr><td>Adresse IP</td><td>$(ip)</td></tr>
-                <tr><td>Upload / Download</td><td>$(bytes-in-nice) / $(bytes-out-nice)</td></tr>
-            $(if session-time-left)
-                <tr><td>Connecté / Restant</td><td>$(uptime) / $(session-time-left)</td></tr>
-            $(else)
-                <tr><td>Temps connecté</td><td>$(uptime)</td></tr>
-            $(endif)
-            $(if blocked == 'yes')
-                <tr><td>Statut</td><td><a href="$(link-advert)" target="hotspot_advert" style="color:var(--accent-secondary)">Publicité requise</a></td></tr>
-            $(endif)
-            </table>
+<div class="main-card">
 
-            $(if login-by-mac != 'yes')
-            <button type="submit" class="btn-submit">Se déconnecter</button>
-            $(endif)
-        </form>
-        
-        <p class="footer-text" style="margin-top: 20px;">Actualisation automatique toutes les 5s</p>
-    </div>
+<div class="header">
+
+$(if login-by == 'trial')
+<h1>Essai gratuit</h1>
+$(elif login-by != 'mac')
+<h1>Bonjour, $(username)</h1>
+$(endif)
+
+<p>Vous êtes connecté au WiFi</p>
+
+</div>
+
+<table>
+
+<tr>
+<td>Adresse IP</td>
+<td id="ip">...</td>
+</tr>
+
+<tr>
+<td>Upload / Download</td>
+<td>
+<span id="bytesIn">...</span> /
+<span id="bytesOut">...</span>
+</td>
+</tr>
+
+$(if session-time-left)
+
+<tr>
+<td>Connecté</td>
+<td id="uptime">...</td>
+</tr>
+
+<tr>
+<td>Restant</td>
+<td id="timeleft">...</td>
+</tr>
+
+$(else)
+
+<tr>
+<td>Temps connecté</td>
+<td id="uptime">...</td>
+</tr>
+
+$(endif)
+
+</table>
+
+</div>
+
 </body>
 </html>
