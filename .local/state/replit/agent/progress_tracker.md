@@ -33,3 +33,10 @@
      - Gradient now has more natural color progression: dark → subtle purple → pale blue → white
      - Eliminated harsh "black line" effect between sections with progressive fade
      - Optimized for mobile with smooth, continuous visual flow
+[x] 17. Refined visual transition and price card legibility
+     - Replaced hard-coded spacer gradient with a cinematic progressive blur mask
+     - Used `backdrop-filter` combined with `mask-image` for an invisible top edge transition
+     - Optimized transition area height to 450px for a smoother "fade-to-white"
+     - Enhanced price cards with a subtle glass effect (`rgba(255,255,255,0.08)`) and 8px blur
+     - Improved legibility of prices on all backgrounds while maintaining minimalist design
+     - Added iOS-specific `-webkit-` prefixes for maximum compatibility
