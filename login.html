@@ -408,7 +408,6 @@
                         class="phone-video"
                         width="100%" 
                         height="100%" 
-                        autoplay
                         playsinline 
                         muted 
                         loop
@@ -514,13 +513,23 @@
             document.querySelector('.tutorial-title').textContent = t.tutorialTitle;
             document.querySelector('.tutorial-subtitle').textContent = t.tutorialSubtitle;
             
-            // Video
+            // Video - change source without triggering autoplay
             const video = document.getElementById('tutorial-video');
-            const source = video.querySelector('source');
-            const videoFile = lang === 'fr' ? './tutorial.mp4' : `./tutorial-${lang}.mp4`;
-            if (source.getAttribute('src') !== videoFile) {
-                source.setAttribute('src', videoFile);
-                video.load();
+            if (video) {
+                const source = video.querySelector('source');
+                const videoFile = lang === 'fr' ? './tutorial.mp4' : `./tutorial-${lang}.mp4`;
+                if (source && source.getAttribute('src') !== videoFile) {
+                    const wasPlaying = !video.paused;
+                    source.setAttribute('src', videoFile);
+                    video.load();
+                    video.pause();
+                    if (wasPlaying) {
+                        const playPromise = video.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(err => console.log('Resume play error:', err));
+                        }
+                    }
+                }
             }
 
             // LocalStorage

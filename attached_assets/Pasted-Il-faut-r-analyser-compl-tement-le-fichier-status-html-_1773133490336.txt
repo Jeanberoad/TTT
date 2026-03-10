@@ -1,0 +1,112 @@
+Il faut **réanalyser complètement le fichier `status.html`**, car il ne fonctionne pas actuellement.
+
+### Problème observé
+
+La page affiche :
+
+* `undefined`
+* `Connecté : undefined`
+* `Restant : ...`
+* `Temps connecté : ...`
+
+et une erreur HTML :
+
+```
+Error response
+Error code: 404
+Message: File not found.
+Error code explanation: 404 - Nothing matches the given URI.
+```
+
+Cela signifie que **le script essaie de récupérer des données depuis une URL qui n’existe pas**.
+
+---
+
+### Contexte important
+
+Comme tu le sais, j’ai essayé **une autre approche pour éviter de rafraîchir la page toutes les 5 secondes**.
+
+L’idée était :
+
+* récupérer les données du hotspot dynamiquement
+* mettre à jour les valeurs avec JavaScript
+* éviter un `meta refresh`
+
+Mais **aucune valeur ne s’affiche actuellement**.
+
+---
+
+### Ce qu’il faut vérifier
+
+Merci de vérifier les points suivants dans `status.html` :
+
+1. **Les variables MikroTik Hotspot**
+
+   Les valeurs doivent provenir de :
+
+   * `$(username)`
+   * `$(uptime)`
+   * `$(session-time-left)`
+   * `$(bytes-in)`
+   * `$(bytes-out)`
+
+   Si elles sont remplacées par JavaScript externe ou une API inexistante, cela provoque le `404`.
+
+2. **Les appels réseau**
+
+   Vérifie si le script tente de charger :
+
+   * un fichier JSON
+   * une API
+   * une URL inexistante
+
+   car la page montre clairement une **requête vers une ressource qui renvoie 404**.
+
+3. **Compatibilité MikroTik**
+
+   Le `status.html` doit fonctionner **avec les variables intégrées RouterOS**.
+   Si le script essaie d’utiliser `fetch()` vers une route locale inexistante, les valeurs ne pourront jamais apparaître.
+
+4. **Suppression du code qui génère `/ undefined`**
+
+   Il semble qu’un script concatène une URL incorrecte ou une variable non définie.
+
+---
+
+### Problème supplémentaire à corriger (vidéos tutoriel)
+
+Il y a aussi un problème avec les **vidéos tutoriel lorsqu’on change de langue**.
+
+Comportement souhaité :
+
+* Les vidéos **ne doivent jamais se lancer automatiquement lors du changement de langue**.
+* La vidéo doit **se lancer uniquement lorsque l’utilisateur scrolle jusqu’à elle** (comme pour la langue par défaut actuellement).
+* Le comportement actuel est incorrect :
+
+  * pour la **langue par défaut**, le système fonctionne correctement (lecture uniquement au scroll)
+  * mais **lorsqu’on change de langue**, la vidéo se lance automatiquement
+
+Il faut donc :
+
+* conserver le système **déclenché par le scroll (IntersectionObserver ou équivalent)**
+* empêcher tout **autoplay déclenché par le changement de langue**
+* réinitialiser correctement la vidéo lors du changement de langue sans la démarrer.
+
+---
+
+### Objectif final
+
+Corriger `status.html` et la logique vidéo pour :
+
+* afficher correctement :
+
+  * utilisateur connecté
+  * temps connecté
+  * temps restant
+  * trafic utilisé
+* **sans refresh automatique de la page**
+* avec **mise à jour dynamique stable**
+* compatible **RouterOS Hotspot**
+* conserver un **système de lecture vidéo uniquement déclenché par le scroll**
+
+Merci de **corriger le script et réécrire la logique si nécessaire**, afin que toutes les valeurs s’affichent correctement et que le comportement vidéo soit cohérent dans toutes les langues.

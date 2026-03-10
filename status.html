@@ -12,35 +12,56 @@
 
 <script>
 
-function updateStatus(){
-
-fetch("status-data.html")
-.then(response => response.text())
-.then(data => {
-
-let d = data.split("|");
-
-if(document.getElementById("ip"))
-document.getElementById("ip").innerText = d[4];
-
-if(document.getElementById("bytesIn"))
-document.getElementById("bytesIn").innerText = d[0];
-
-if(document.getElementById("bytesOut"))
-document.getElementById("bytesOut").innerText = d[1];
-
-if(document.getElementById("uptime"))
-document.getElementById("uptime").innerText = d[2];
-
-if(d[3] && document.getElementById("timeleft"))
-document.getElementById("timeleft").innerText = d[3];
-
-});
-
+function formatBytes(bytes) {
+    if (!bytes || isNaN(bytes)) return '0 B';
+    bytes = parseInt(bytes);
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
 }
 
-setInterval(updateStatus,5000);
-window.onload = updateStatus;
+function formatUptime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0s';
+    seconds = parseInt(seconds);
+    if (seconds === 0) return '0s';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+        return hours + 'h ' + minutes + 'm ' + secs + 's';
+    } else if (minutes > 0) {
+        return minutes + 'm ' + secs + 's';
+    } else {
+        return secs + 's';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const bytesInEl = document.getElementById('bytesIn');
+    const bytesOutEl = document.getElementById('bytesOut');
+    const uptimeEl = document.getElementById('uptime');
+    const timeleftEl = document.getElementById('timeleft');
+
+    if (bytesInEl && bytesInEl.textContent.trim() && bytesInEl.textContent !== '...') {
+        bytesInEl.textContent = formatBytes(bytesInEl.textContent);
+    }
+    
+    if (bytesOutEl && bytesOutEl.textContent.trim() && bytesOutEl.textContent !== '...') {
+        bytesOutEl.textContent = formatBytes(bytesOutEl.textContent);
+    }
+    
+    if (uptimeEl && uptimeEl.textContent.trim() && uptimeEl.textContent !== '...') {
+        uptimeEl.textContent = formatUptime(uptimeEl.textContent);
+    }
+    
+    if (timeleftEl && timeleftEl.textContent.trim() && timeleftEl.textContent !== '...') {
+        timeleftEl.textContent = formatUptime(timeleftEl.textContent);
+    }
+});
 
 </script>
 
@@ -79,14 +100,14 @@ $(endif)
 
 <tr>
 <td>Adresse IP</td>
-<td id="ip">...</td>
+<td id="ip">$(client-ip)</td>
 </tr>
 
 <tr>
 <td>Upload / Download</td>
 <td>
-<span id="bytesIn">...</span> /
-<span id="bytesOut">...</span>
+<span id="bytesIn">$(bytes-in)</span> /
+<span id="bytesOut">$(bytes-out)</span>
 </td>
 </tr>
 
@@ -94,19 +115,19 @@ $(if session-time-left)
 
 <tr>
 <td>Connecté</td>
-<td id="uptime">...</td>
+<td id="uptime">$(uptime)</td>
 </tr>
 
 <tr>
 <td>Restant</td>
-<td id="timeleft">...</td>
+<td id="timeleft">$(session-time-left)</td>
 </tr>
 
 $(else)
 
 <tr>
 <td>Temps connecté</td>
-<td id="uptime">...</td>
+<td id="uptime">$(uptime)</td>
 </tr>
 
 $(endif)

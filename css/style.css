@@ -31,6 +31,7 @@ html[data-theme="morning"] {
     --accent-secondary: #38d6ff;
     --accent-tertiary: #ffd36a;
 }
+
 html[data-theme="noon"] {
     --bg-color: #06121b;
     --bg-image: url("../img/bg-noon.jpg");
@@ -39,6 +40,7 @@ html[data-theme="noon"] {
     --accent-secondary: #00c2ff;
     --accent-tertiary: #ffd400;
 }
+
 html[data-theme="afternoon"] {
     --bg-color: #12060e;
     --bg-image: url("../img/bg-afternoon.jpg");
@@ -47,6 +49,7 @@ html[data-theme="afternoon"] {
     --accent-secondary: #ff9b2f;
     --accent-tertiary: #ffdd55;
 }
+
 html[data-theme="night"] {
     --bg-color: #05070a;
     --bg-image: url("../img/bg-night.jpg");
@@ -83,11 +86,13 @@ body {
 body::after {
     content: '';
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-image: 
-        linear-gradient(180deg, 
-            transparent 0%, 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(180deg,
+            transparent 0%,
             rgba(250, 250, 250, calc(var(--scroll-bg-opacity) * 0.3)) 100%),
         var(--bg-image);
     background-size: cover;
@@ -103,15 +108,18 @@ body::after {
 body::before {
     content: '';
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(to bottom, var(--bg-overlay), rgba(0,0,0,0.55)),
-                radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(0, 206, 209, 0.15) 0%, transparent 40%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--bg-overlay), rgba(0, 0, 0, 0.55)),
+        radial-gradient(circle at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(0, 206, 209, 0.15) 0%, transparent 40%);
     z-index: -1;
 }
 
-.login-card, .main-card {
+.login-card,
+.main-card {
     background: var(--card-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -337,8 +345,8 @@ table td:last-child {
 
 .price-card {
     background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 16px;
     padding: 22px 24px;
@@ -452,6 +460,7 @@ table td:last-child {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -463,6 +472,7 @@ table td:last-child {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -474,6 +484,7 @@ table td:last-child {
         opacity: 0;
         transform: translateX(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -484,6 +495,7 @@ table td:last-child {
     .login-card {
         padding: 30px 20px;
     }
+
     #reader {
         max-width: 100%;
     }
@@ -494,7 +506,8 @@ table td:last-child {
 .lang-selector {
     position: absolute;
     top: 16px;
-    right: 72px; /* Next to theme toggle */
+    right: 72px;
+    /* Next to theme toggle */
     z-index: 100;
 }
 
@@ -585,11 +598,13 @@ table td:last-child {
     -webkit-tap-highlight-color: transparent;
     transition: all var(--transition-smooth);
 }
+
 .theme-toggle:hover {
     background: rgba(15, 20, 30, 0.6);
     border-color: var(--accent-secondary);
     box-shadow: 0 0 15px rgba(0, 206, 209, 0.3);
 }
+
 .theme-toggle svg {
     width: 24px;
     height: 24px;
@@ -599,8 +614,14 @@ table td:last-child {
     opacity: 0.95;
     transition: transform var(--transition-smooth);
 }
-.theme-toggle:hover svg { transform: rotate(20deg); }
-.theme-toggle:active { transform: scale(0.96); }
+
+.theme-toggle:hover svg {
+    transform: rotate(20deg);
+}
+
+.theme-toggle:active {
+    transform: scale(0.96);
+}
 
 /* Password eye toggle */
 .password-group {
@@ -608,7 +629,8 @@ table td:last-child {
 }
 
 .password-group input {
-    padding-right: 52px; /* espace pour l’icône œil */
+    padding-right: 52px;
+    /* espace pour l’icône œil */
 }
 
 .toggle-password {
@@ -649,11 +671,18 @@ table td:last-child {
 }
 
 /* Par défaut: œil ouvert visible, œil barré caché */
-.toggle-password .eye-closed { display: none; }
+.toggle-password .eye-closed {
+    display: none;
+}
 
 /* Quand le mot de passe est visible */
-.toggle-password.is-visible .eye-open { display: none; }
-.toggle-password.is-visible .eye-closed { display: inline; }
+.toggle-password.is-visible .eye-open {
+    display: none;
+}
+
+.toggle-password.is-visible .eye-closed {
+    display: inline;
+}
 
 /* Tutorial section - smooth gradient transition */
 .tutorial-spacer {
@@ -675,18 +704,18 @@ table td:last-child {
     height: 100%;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    mask-image: linear-gradient(to bottom, 
-        transparent 0%, 
-        rgba(0,0,0,0.02) 10%,
-        rgba(0,0,0,0.2) 35%, 
-        rgba(0,0,0,0.7) 70%,
-        black 100%);
-    -webkit-mask-image: linear-gradient(to bottom, 
-        transparent 0%, 
-        rgba(0,0,0,0.02) 10%,
-        rgba(0,0,0,0.2) 35%, 
-        rgba(0,0,0,0.7) 70%,
-        black 100%);
+    mask-image: linear-gradient(to bottom,
+            transparent 0%,
+            rgba(0, 0, 0, 0.02) 10%,
+            rgba(0, 0, 0, 0.2) 35%,
+            rgba(0, 0, 0, 0.7) 70%,
+            black 100%);
+    -webkit-mask-image: linear-gradient(to bottom,
+            transparent 0%,
+            rgba(0, 0, 0, 0.02) 10%,
+            rgba(0, 0, 0, 0.2) 35%,
+            rgba(0, 0, 0, 0.7) 70%,
+            black 100%);
 }
 
 .tutorial-spacer::after {
@@ -696,12 +725,12 @@ table td:last-child {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0) 10%,
-        rgba(255, 255, 255, 0.4) 40%,
-        rgba(255, 255, 255, 0.8) 75%,
-        var(--transition-color) 100%);
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            rgba(255, 255, 255, 0) 10%,
+            rgba(255, 255, 255, 0.4) 40%,
+            rgba(255, 255, 255, 0.8) 75%,
+            var(--transition-color) 100%);
 }
 
 .tutorial-section {
@@ -794,9 +823,17 @@ table td:last-child {
     fill: currentColor;
 }
 
-.mute-toggle .volume-on { display: none; }
-.mute-toggle.is-unmuted .volume-off { display: none; }
-.mute-toggle.is-unmuted .volume-on { display: block; }
+.mute-toggle .volume-on {
+    display: none;
+}
+
+.mute-toggle.is-unmuted .volume-off {
+    display: none;
+}
+
+.mute-toggle.is-unmuted .volume-on {
+    display: block;
+}
 
 .tutorial-subtitle {
     color: #4a5a7a;
@@ -899,6 +936,7 @@ table td:last-child {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -909,11 +947,11 @@ table td:last-child {
     .phone-frame {
         max-width: 240px;
     }
-    
+
     .tutorial-title {
         font-size: 24px;
     }
-    
+
     .tutorial-subtitle {
         font-size: 14px;
     }

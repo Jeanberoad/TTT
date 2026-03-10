@@ -41,3 +41,16 @@
      - Enhanced price cards with a subtle glass effect (`rgba(255,255,255,0.08)`) and 8px blur
      - Improved legibility of prices on all backgrounds while maintaining minimalist design
      - Added iOS-specific `-webkit-` prefixes for maximum compatibility
+[x] 18. Migration to Replit environment completed - project verified and running on port 5000
+[x] 19. Fixed status.html and video language change issues
+     - Removed broken fetch("status-data.html") call that was causing 404 errors
+     - Replaced with direct MikroTik variables: $(username), $(uptime), $(session-time-left), $(bytes-in), $(bytes-out), $(client-ip)
+     - Added formatBytes() function to convert raw bytes to human-readable format (B, KB, MB, GB)
+     - Added formatUptime() function to convert seconds to readable HH:MM:SS format
+     - JavaScript now applies formatting to MikroTik variable values at page load
+     - Removed `autoplay` attribute from video element to prevent unintended autoplay
+     - Fixed language change video behavior:
+       * Videos no longer autoplay when changing language
+       * Video playback state preserved if user was watching
+       * Scroll-based IntersectionObserver still controls autoplay properly
+       * Language change only updates video source without triggering playback
