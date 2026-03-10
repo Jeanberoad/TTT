@@ -1,0 +1,72 @@
+Je souhaite ajouter un **menu de sélection de langue** en haut à droite de la page login.
+
+### 1. Configuration générale
+
+* **Langue par défaut : français**
+* **Icône par défaut : drapeau français**
+* Menu **bluré en fond** pour s’harmoniser avec le design glassmorphism
+* Menu déroulant **au survol de la souris** (hover)
+* Affiche **uniquement les drapeaux**, pas le texte
+* Ordre des options :
+
+  1. France 🇫🇷
+  2. Madagascar 🇲🇬
+  3. USA 🇺🇸
+
+---
+
+### 2. Gestion des images de fond par langue
+
+Lot actuel (par défaut) :
+
+* `bg-afternoon.jpg`
+* `bg-morning.jpg`
+* `bg-night.jpg`
+* `bg-noon.jpg`
+
+Pour chaque langue, ajouter **préfixe langue** au début du nom des fichiers.
+
+Exemple :
+
+* Français : (par défaut, sans préfixe)
+  `bg-afternoon.jpg`, `bg-morning.jpg`, ...
+* Malagasy :
+  `mg-bg-afternoon.jpg`, `mg-bg-morning.jpg`, ...
+* Anglais :
+  `en-bg-afternoon.jpg`, `en-bg-morning.jpg`, ...
+
+---
+
+### 3. Fonctionnalités du menu
+
+* Lorsqu’un utilisateur **survole le menu**, le menu **se déploie** et montre les trois drapeaux dans l’ordre indiqué
+* Lorsqu’un utilisateur **clique sur un drapeau**, la page :
+
+  * change la langue des textes
+  * change la vidéo tutoriel correspondante
+  * change le background selon la langue (avec les images préfixées)
+* L’icône principale du menu reste **le drapeau de la langue actuellement sélectionnée**
+
+---
+
+### 4. Design attendu
+
+* Menu **petit et discret**, aligné à droite en haut
+* **Fond légèrement bluré**
+* Les drapeaux doivent être visibles, bien espacés
+* Menu responsive sur mobile (déroulement par clic si hover non supporté)
+
+---
+
+### 5. Instructions pour Replit
+
+Merci de modifier le `login.html` et le CSS associé pour :
+
+1. Intégrer ce menu de sélection de langue en haut à droite
+2. Déployer automatiquement le menu au hover
+3. Afficher **uniquement les drapeaux**
+4. Appliquer le blur de fond au menu
+5. Charger les images de fond et la vidéo tutoriel correspondantes à chaque langue
+6. Définir le français comme langue par défaut
+
+Le menu doit être **entièrement fonctionnel côté client**, en JavaScript pur, compatible avec **Safari iOS et Android**.

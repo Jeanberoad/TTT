@@ -1,0 +1,76 @@
+Je souhaite simplifier certains effets visuels pour améliorer la compatibilité avec les appareils anciens ou peu puissants.
+
+### 1. Supprimer tous les effets **glow animés**
+
+Merci de retirer **tous les effets glow animés** dans l’interface.
+Ces animations causent des ralentissements sur certains téléphones.
+
+Cela inclut notamment :
+
+* le **glow animé autour du login**
+* le **glow animé autour du cadre du téléphone dans la section tutoriel**
+* les **glow animés dans la page status**
+* tout autre glow animé ailleurs dans le projet (si j’en ai oublié)
+
+Actions à effectuer :
+
+* supprimer les `animation` liées au glow
+* supprimer les `box-shadow` animés
+* supprimer les `filter: blur()` utilisés uniquement pour créer un halo lumineux
+
+Si nécessaire, remplacer par une **version statique très légère**, par exemple :
+
+* un `box-shadow` très discret
+* ou aucune lumière autour de l’élément.
+
+L’objectif est de **garder un design propre mais beaucoup plus léger**.
+
+---
+
+### 2. Ajouter un bouton pour activer le son de la vidéo tutoriel
+
+Dans la section tutoriel :
+
+Titre actuel :
+**"Comment ça marche ?"**
+
+Je souhaite ajouter **une petite icône de haut-parleur à droite de ce titre**.
+
+Fonction :
+
+* la vidéo reste **muted par défaut** (important pour l’autoplay mobile)
+* quand l’utilisateur clique sur l’icône :
+
+  * le son de la vidéo s’active
+  * l’icône change visuellement (par exemple haut-parleur barré → haut-parleur actif)
+
+Comportement attendu :
+
+* clic → `video.muted = false`
+* clic à nouveau → `video.muted = true`
+
+L’icône doit être :
+
+* petite
+* alignée horizontalement avec le titre
+* bien visible mais discrète.
+
+---
+
+### 3. Compatibilité mobile
+
+Important :
+
+* doit fonctionner sur **Safari iOS**
+* doit fonctionner sur **Android**
+* ne pas casser l’autoplay de la vidéo.
+
+---
+
+### 4. Ne pas casser le design existant
+
+Les modifications doivent :
+
+* conserver la structure actuelle
+* modifier uniquement les effets visuels et ajouter le bouton audio
+* ne pas casser le layout existant.

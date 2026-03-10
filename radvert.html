@@ -1,0 +1,118 @@
+<html>
+<head>
+<meta http-equiv="refresh" content="6; url=$(link-orig)">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />   
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="-1">
+<title>Internet hotspot - Advertisement</title>
+<link rel="stylesheet" href="css/style.css">
+    <script src="theme.js"></script>
+<script>
+
+    var popup = '';
+    function openOrig() {
+	if (window.focus) popup.focus();
+	location.href = unescape('$(link-orig-esc)');
+    }
+    function openAd() {
+	location.href = unescape('$(link-redirect-esc)');
+    }
+    function openAdvert() {
+	if (window.name != 'hotspot_advert') {
+		popup = open('$(link-redirect)', 'hotspot_advert', '');
+		setTimeout("openOrig()", 1000);
+		return;
+	}
+	setTimeout("openAd()", 1000);
+    }
+</script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=2.0" />
+    <title>WiFi De Tsararano</title>
+	<style>
+	body, html{
+		margin:0;
+		padding:0;
+		height:100%;
+		font-family:"Segoe UI",Arial,sans-serif;
+		background:transparent;
+		display:flex;
+		flex-direction:column;
+		align-items:center;
+	}
+
+	.wrap{
+		text-align:center;
+		width:100%;
+		padding-top:50px;
+	}
+
+	/* Titre inspiré du portail login */
+	h1{
+		font-size:3.2em;
+		font-weight:700;
+		letter-spacing:2px;
+		margin-bottom:30px;
+
+		color: #ffffff;
+
+		text-shadow:
+			0 0 10px rgba(138,43,226,0.6),
+			0 0 20px rgba(0,206,209,0.5),
+			0 0 40px rgba(0,206,209,0.3);
+
+		animation:titleReveal 1.2s ease-out;
+	}
+
+	/* animation douce d’apparition */
+	@keyframes titleReveal{
+		0%{
+			opacity:0;
+			transform:translateY(-25px) scale(0.9);
+			filter:blur(8px);
+		}
+		100%{
+			opacity:1;
+			transform:translateY(0) scale(1);
+			filter:blur(0);
+		}
+	}
+
+	/* Image pub */
+	img.pub{
+		width:92%;
+		max-height:75vh;
+		object-fit:cover;
+		border-radius:22px;
+		box-shadow:0 15px 35px rgba(0,0,0,0.25);
+		margin-top:15px;
+	}
+
+	/* mobile */
+	@media(max-width:600px){
+		h1{
+			font-size:2.2em;
+		}
+	}
+	</style>
+    <script>
+        function openAdvert() {
+            // logique de redirection si nécessaire
+        }
+    </script>
+</head>
+<body onLoad="openAdvert()">
+    <div class="ie-fixMinHeight">
+        <div class="main">
+            <div class="wrap">
+                <h1>WiFi De Tsararano</h1>
+                <img src="pub.png" alt="Publicité" class="pub">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
