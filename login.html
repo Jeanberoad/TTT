@@ -1,3 +1,10 @@
+<script>
+if (!sessionStorage.getItem("advertShown")) {
+    sessionStorage.setItem("advertShown", "yes");
+    window.location.href = "radvert.html";
+}
+</script>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,6 +16,9 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="theme.js"></script>
 </head>
+
+<a href="old/login.html" class="btn-old" id="fallback-btn" style="display: none; opacity: 0;">Basique</a>
+
 <body>
 
     $(if chap-id)
@@ -282,6 +292,7 @@
                     } else if (err && err.name === 'OverconstrainedError') {
                         errorMsg = "Caméra arrière indisponible, essayez une autre caméra.";
                     }
+					
 
                     showError(errorMsg);
                     await safeStopQr();
@@ -371,12 +382,12 @@
             <span class="price-amount">3 000 Ar</span>
         </div>
                 
-        <div class="price-card" data-prefix="1h30m-0">
+        <div class="price-card" data-prefix="1h30m-">
             <span class="price-time">1h 30m</span>
             <span class="price-amount">1 000 Ar</span>
         </div>
 
-        <div class="price-card" data-prefix="30m-0">
+        <div class="price-card" data-prefix="30m-">
             <span class="price-time">30m</span>
             <span class="price-amount">500 Ar</span>
         </div>
@@ -424,8 +435,50 @@
     </section>
 
     <script>
+			const ERROR_TRANSLATIONS = {
+			  fr: {
+				"invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
+				"no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
+				"has reached uptime limit": "Votre temps de connexion est épuisé.",
+				"has reached traffic limit": "Votre forfait internet est épuisé.",
+				"not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
+				"web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
+				"radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
+				"already authorizing": "Connexion déjà en cours, veuillez patienter.",
+				"cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
+				"you are not logged in": "Vous n’êtes pas connecté."
+			  },
+
+			  mg: {
+				"invalid username or password": "Diso ny anarana na ny teny miafina.",
+				"no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
+				"has reached uptime limit": "Efa tampitra ny fehim-potoana.",
+				"has reached traffic limit": "Lany ny data-nao.",
+				"not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
+				"web browser did not send challenge": "Misy olana kely, avereno indray.",
+				"radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
+				"already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
+				"cannot assign ip address": "Feno ny tambazotra.",
+				"you are not logged in": "Tsy tafiditra ianao."
+			  },
+
+			  en: {
+				"invalid username or password": "Invalid username or password.",
+				"no more sessions are allowed": "This account is already in use.",
+				"has reached uptime limit": "Your time limit has been reached.",
+				"has reached traffic limit": "Your data limit has been reached.",
+				"not allowed to log in from this mac": "This account is not allowed on this device.",
+				"web browser did not send challenge": "Security error. Please refresh and try again.",
+				"radius server is not responding": "Authentication server is not responding.",
+				"already authorizing": "Authorization in progress. Please wait.",
+				"cannot assign ip address": "Network is full. No IP available.",
+				"you are not logged in": "You are not logged in."
+			  }
+			};
+			
         const TRANSLATIONS = {
             fr: {
+			    fallback: "Basique",
                 title: "WiFi De Tsararano",
                 subtitle: "à votre service",
                 username: "Nom d'utilisateur",
@@ -436,41 +489,43 @@
                 copyBtn: "Copier le lien",
                 tariffs: "Nos Tarifs",
                 month: "1 mois",
-                day: "24h",
+                day: "24 heures",
                 tutorialTitle: "Comment ça marche ?",
                 tutorialSubtitle: "Regardez ce court tutoriel pour vous connecter facilement",
                 muteLabel: "Activer le son",
                 unmuteLabel: "Couper le son"
             },
             mg: {
+			    fallback: "Tsotra",
                 title: "WiFi De Tsararano",
-                subtitle: "vonona hanampy anao",
-                username: "Anarana fidirana",
-                password: "Teny miafina",
+                subtitle: "nenao, nenakay, nentsika jiaby !",
+                username: "Anarana",
+                password: "Tenimiafina",
                 login: "Hiditra",
-                scan: "Hijery QR Code",
-                copyInfo: "Adikao ny rohy dia sokafy amin'ny mpitety tranonkala.",
-                copyBtn: "Adikao ny rohy",
-                tariffs: "Ny Sarany",
+                scan: "Ampiasa QR Code",
+                copyInfo: "Ataovy copier coller anaty 'navigateur internet' mahazatra anao (ohatra : chrome na safari).",
+                copyBtn: "Kopieo",
+                tariffs: "Sarany",
                 month: "1 volana",
                 day: "24 ora",
-                tutorialTitle: "Ahoana no fiasa izy ?",
-                tutorialSubtitle: "Jereo ity horonantsary ity hanampy anao hiditra",
-                muteLabel: "Hampandrenesina",
-                unmuteLabel: "Hampanginina"
+                tutorialTitle: "Liana ve ianao?",
+                tutorialSubtitle: "Jereo ity sarimihetsika ity fa hanampy anao",
+                muteLabel: "Misy feony",
+                unmuteLabel: "WC"
             },
             en: {
+			    fallback: "Basic",
                 title: "WiFi De Tsararano",
-                subtitle: "at your service",
+                subtitle: "Stay Connected",
                 username: "Username",
                 password: "Password",
                 login: "Connect",
                 scan: "Scan QR Code",
-                copyInfo: "Copy the link then open it in your browser.",
+                copyInfo: "Copy the link then open it in your internet browser.",
                 copyBtn: "Copy link",
                 tariffs: "Our Rates",
                 month: "1 month",
-                day: "24h",
+                day: "24 hour",
                 tutorialTitle: "How it works?",
                 tutorialSubtitle: "Watch this short tutorial to connect easily",
                 muteLabel: "Turn on sound",
@@ -490,7 +545,11 @@
             // Header
             document.querySelector('.header h1').textContent = t.title;
             document.querySelector('.header p').textContent = t.subtitle;
-
+			// Mise à jour du texte du bouton de secours
+			const fallbackBtn = document.getElementById('fallback-btn');
+			if (fallbackBtn) {
+			fallbackBtn.textContent = t.fallback;
+			}
             // Form
             document.querySelector('input[name="username"]').placeholder = t.username;
             document.querySelector('input[name="password"]').placeholder = t.password;
@@ -538,8 +597,36 @@
             // Update theme prefixes indirectly by telling theme.js if needed, 
             // but we'll override the background logic here to support prefixes.
             updateBackgrounds(lang);
+			
+			translateErrorMessage(lang);
+    
+            localStorage.setItem('hotspot_lang', lang);
         }
+        
+			function normalize(str) {
+			  return str
+				.toLowerCase()
+				.normalize("NFD")
+				.replace(/[\u0300-\u036f]/g, "");
+			}
 
+			function translateErrorMessage(lang) {
+			  const errorDiv = document.querySelector('.error-msg');
+			  if (!errorDiv) return;
+
+			  const original = normalize(errorDiv.textContent);
+			  const translations = ERROR_TRANSLATIONS[lang];
+			  if (!translations) return;
+
+			  for (let key in translations) {
+				if (original.includes(normalize(key))) {
+				  errorDiv.textContent = translations[key];
+				  return;
+				}
+			  }
+			}
+		
+		
         function updateBackgrounds(lang) {
             const prefix = lang === 'fr' ? '' : lang + '-';
             const style = document.documentElement.style;
@@ -576,26 +663,26 @@
         });
 
         // Radiant effect color animation with smooth transitions
-        const radiantColors = [
-            { primary: '#8a2be2', secondary: '#00ced1', rgb1: '138, 43, 226', rgb2: '0, 206, 209' },
-            { primary: '#ff4f7b', secondary: '#ff9b2f', rgb1: '255, 79, 123', rgb2: '255, 155, 47' },
-            { primary: '#2b6de2', secondary: '#38d6ff', rgb1: '43, 109, 226', rgb2: '56, 214, 255' },
-            { primary: '#ff8a00', secondary: '#00c2ff', rgb1: '255, 138, 0', rgb2: '0, 194, 255' }
-        ];
+       // const radiantColors = [
+       //     { primary: '#8a2be2', secondary: '#00ced1', rgb1: '138, 43, 226', rgb2: '0, 206, 209' },
+       //     { primary: '#ff4f7b', secondary: '#ff9b2f', rgb1: '255, 79, 123', rgb2: '255, 155, 47' },
+       //     { primary: '#2b6de2', secondary: '#38d6ff', rgb1: '43, 109, 226', rgb2: '56, 214, 255' },
+       //     { primary: '#ff8a00', secondary: '#00c2ff', rgb1: '255, 138, 0', rgb2: '0, 194, 255' }
+       // ];
         
-        let colorIndex = 0;
-        function rotateRadiantColors() {
-            colorIndex = (colorIndex + 1) % radiantColors.length;
-            const colors = radiantColors[colorIndex];
-            const style = document.documentElement.style;
-            style.setProperty('--radiant-primary', colors.primary);
-            style.setProperty('--radiant-secondary', colors.secondary);
-            style.setProperty('--radiant-primary-rgb', colors.rgb1);
-            style.setProperty('--radiant-secondary-rgb', colors.rgb2);
-        }
+       // let colorIndex = 0;
+      //  function rotateRadiantColors() {
+       //     colorIndex = (colorIndex + 1) % radiantColors.length;
+        //    const colors = radiantColors[colorIndex];
+        //    const style = document.documentElement.style;
+         //   style.setProperty('--radiant-primary', colors.primary);
+        //    style.setProperty('--radiant-secondary', colors.secondary);
+         //   style.setProperty('--radiant-primary-rgb', colors.rgb1);
+         //   style.setProperty('--radiant-secondary-rgb', colors.rgb2);
+       // }
         
-        setInterval(rotateRadiantColors, 2000);
-        rotateRadiantColors();
+        // setInterval(rotateRadiantColors, 2000);
+        // rotateRadiantColors();
 
         // Scroll-based background fade effect - more progressive and smooth
         let lastScrollY = 0;
@@ -672,6 +759,60 @@
                 }
             }, false);
         });
+    </script>
+
+    <script>
+        // Mobile-friendly language menu toggle
+        const langSelector = document.querySelector('.lang-selector');
+        const langCurrent = document.querySelector('.lang-current');
+        const langOptions = document.querySelectorAll('.lang-option');
+
+        // Check if device supports touch
+        const isTouchDevice = () => {
+            return (('ontouchstart' in window) ||
+                    (navigator.maxTouchPoints > 0) ||
+                    (navigator.msMaxTouchPoints > 0));
+        };
+
+        const isTouch = isTouchDevice();
+
+        // Toggle menu on touch devices
+        if (isTouch && langCurrent) {
+            langCurrent.addEventListener('click', (e) => {
+                e.stopPropagation();
+                langSelector.classList.toggle('active');
+            });
+
+            // Close menu when a language is selected
+            langOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const lang = option.getAttribute('data-lang');
+                    if (lang) {
+                        updateLanguage(lang);
+                        langSelector.classList.remove('active');
+                    }
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!langSelector.contains(e.target)) {
+                    langSelector.classList.remove('active');
+                }
+            });
+        }
+		
+		// Apparition du bouton de secours après 10 secondes
+		setTimeout(() => {
+		const btn = document.getElementById('fallback-btn');
+		if (btn) {
+		btn.style.display = 'block';
+		// Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
+		setTimeout(() => { btn.style.opacity = '1'; }, 50);
+		}
+		}, 30000); // 10 000 ms = 10 secondes
+		
     </script>
 
 </body>

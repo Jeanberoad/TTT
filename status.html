@@ -1,140 +1,59 @@
 <html>
 <head>
+<meta http-equiv="refresh" content="5">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">   
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />   
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="expires" content="-1">
-
 <title>Statut - WiFi de Tsararano</title>
-
 <link rel="stylesheet" href="css/style.css">
-<script src="theme.js"></script>
-
-<script>
-
-function formatBytes(bytes) {
-    if (!bytes || isNaN(bytes)) return '0 B';
-    bytes = parseInt(bytes);
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
-}
-
-function formatUptime(seconds) {
-    if (!seconds || isNaN(seconds)) return '0s';
-    seconds = parseInt(seconds);
-    if (seconds === 0) return '0s';
-    
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    
-    if (hours > 0) {
-        return hours + 'h ' + minutes + 'm ' + secs + 's';
-    } else if (minutes > 0) {
-        return minutes + 'm ' + secs + 's';
-    } else {
-        return secs + 's';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const bytesInEl = document.getElementById('bytesIn');
-    const bytesOutEl = document.getElementById('bytesOut');
-    const uptimeEl = document.getElementById('uptime');
-    const timeleftEl = document.getElementById('timeleft');
-
-    if (bytesInEl && bytesInEl.textContent.trim() && bytesInEl.textContent !== '...') {
-        bytesInEl.textContent = formatBytes(bytesInEl.textContent);
-    }
-    
-    if (bytesOutEl && bytesOutEl.textContent.trim() && bytesOutEl.textContent !== '...') {
-        bytesOutEl.textContent = formatBytes(bytesOutEl.textContent);
-    }
-    
-    if (uptimeEl && uptimeEl.textContent.trim() && uptimeEl.textContent !== '...') {
-        uptimeEl.textContent = formatUptime(uptimeEl.textContent);
-    }
-    
-    if (timeleftEl && timeleftEl.textContent.trim() && timeleftEl.textContent !== '...') {
-        timeleftEl.textContent = formatUptime(timeleftEl.textContent);
-    }
-});
-
-</script>
-
+    <script src="theme.js"></script>
 <script>
 $(if advert-pending == 'yes')
-var popup = '';
-function focusAdvert() {
-    if (window.focus) popup.focus();
-}
-function openAdvert() {
-    popup = open('$(link-advert)', 'hotspot_advert', '');
-    setTimeout("focusAdvert()", 1000);
-}
+    var popup = '';
+    function focusAdvert() {
+        if (window.focus) popup.focus();
+    }
+    function openAdvert() {
+        popup = open('$(link-advert)', 'hotspot_advert', '');
+        setTimeout("focusAdvert()", 1000);
+    }
 $(endif)
+    function openLogout() {
+        if (window.name != 'hotspot_status') return true;
+        open('$(link-logout)', 'hotspot_logout', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=280,height=250');
+        window.close();
+        return false;
+    }
 </script>
-
 </head>
-
 <body $(if advert-pending == 'yes') onLoad="openAdvert()" $(endif)>
+    <div class="main-card">
+        <div class="header">
+            $(if login-by == 'trial')
+                <h1>Essai gratuit</h1>
+            $(elif login-by != 'mac')
+                <h1>Bonjour, $(username)</h1>
+            $(endif)
+            <p>Vous êtes connecté au WiFi</p>
+        </div>
 
-<div class="main-card">
-
-<div class="header">
-
-$(if login-by == 'trial')
-<h1>Essai gratuit</h1>
-$(elif login-by != 'mac')
-<h1>Bonjour, $(username)</h1>
-$(endif)
-
-<p>Vous êtes connecté au WiFi</p>
-
-</div>
-
-<table>
-
-<tr>
-<td>Adresse IP</td>
-<td id="ip">$(client-ip)</td>
-</tr>
-
-<tr>
-<td>Upload / Download</td>
-<td>
-<span id="bytesIn">$(bytes-in)</span> /
-<span id="bytesOut">$(bytes-out)</span>
-</td>
-</tr>
-
-$(if session-time-left)
-
-<tr>
-<td>Connecté</td>
-<td id="uptime">$(uptime)</td>
-</tr>
-
-<tr>
-<td>Restant</td>
-<td id="timeleft">$(session-time-left)</td>
-</tr>
-
-$(else)
-
-<tr>
-<td>Temps connecté</td>
-<td id="uptime">$(uptime)</td>
-</tr>
-
-$(endif)
-
-</table>
-
-</div>
-
+        <form action="$(link-logout)" name="logout" onSubmit="return openLogout()">
+            <table>
+                <tr><td>Adresse IP</td><td>$(ip)</td></tr>
+                <tr><td>Upload / Download</td><td>$(bytes-in-nice) / $(bytes-out-nice)</td></tr>
+            $(if session-time-left)
+                <tr><td>Connecté / Restant</td><td>$(uptime) / $(session-time-left)</td></tr>
+            $(else)
+                <tr><td>Temps connecté</td><td>$(uptime)</td></tr>
+            $(endif)
+            $(if blocked == 'yes')
+                <tr><td>Statut</td><td><a href="$(link-advert)" target="hotspot_advert" style="color:var(--accent-secondary)">Publicité requise</a></td></tr>
+            $(endif)
+            </table>
+        </form>
+        
+        <p class="footer-text" style="margin-top: 20px;">Actualisation automatique toutes les 5s</p>
+    </div>
 </body>
 </html>

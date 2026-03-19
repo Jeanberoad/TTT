@@ -165,6 +165,36 @@ table td:last-child {
     margin-bottom: 20px;
 }
 
+/* --- BOUTON DE SECOURS (FALLBACK) --- */
+.btn-old {
+    position: fixed;
+    top: 15px; /* Positionné en haut */
+    right: 15px; /* Positionné à droite */
+    padding: 8px 16px;
+    
+    /* Fond sombre semi-transparent pour parer au bug du fond blanc */
+    background: rgba(0, 0, 0, 0.75); 
+    color: #ffffff;
+    
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: bold;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    z-index: 10000; /* Toujours au-dessus de tout */
+    font-family: Arial, sans-serif;
+    
+    /* Transition pour l'apparition en douceur */
+    display: none; 
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+
+.btn-old:hover {
+    background: #000;
+    border-color: #fff;
+}
+
 .btn-link {
     display: block;
     width: 100%;
@@ -496,6 +526,20 @@ table td:last-child {
         padding: 30px 20px;
     }
 
+    .header {
+        padding-top: 20px;
+        margin-bottom: 32px;
+    }
+
+    .header h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .header p {
+        font-size: 14px;
+    }
+
     #reader {
         max-width: 100%;
     }
@@ -557,6 +601,25 @@ table td:last-child {
     transform: translateY(0);
 }
 
+/* Mobile touch device state - active class replaces hover */
+@media (hover: none) and (pointer: coarse) {
+    .lang-selector:hover .lang-current,
+    .lang-selector:hover .lang-dropdown {
+        /* Disable hover effects on touch devices */
+    }
+    
+    .lang-selector.active .lang-current {
+        border-color: var(--accent-secondary);
+        background: rgba(15, 20, 30, 0.6);
+    }
+    
+    .lang-selector.active .lang-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+}
+
 .lang-option {
     width: 36px;
     height: 36px;
@@ -575,7 +638,24 @@ table td:last-child {
 
 @media (max-width: 480px) {
     .lang-selector {
-        right: 64px;
+        right: 56px;
+        top: 12px;
+    }
+
+    .lang-current {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .lang-dropdown {
+        top: 42px;
+    }
+
+    .lang-option {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
     }
 }
 
