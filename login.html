@@ -292,7 +292,7 @@ if (!sessionStorage.getItem("advertShown")) {
                     } else if (err && err.name === 'OverconstrainedError') {
                         errorMsg = "Caméra arrière indisponible, essayez une autre caméra.";
                     }
-					
+                                        
 
                     showError(errorMsg);
                     await safeStopQr();
@@ -434,51 +434,264 @@ if (!sessionStorage.getItem("advertShown")) {
         </div>
     </section>
 
+    <!-- ===== PICS SECTION ===== -->
+    <div class="pics-spacer"></div>
+
+    <section class="pics-section">
+        <div class="pics-content">
+            <h2 class="pics-title">PICS</h2>
+            <p class="pics-subtitle" id="pics-subtitle">Nos moments en images</p>
+            <div class="pics-grid" id="pics-grid"></div>
+            <p class="pics-empty" id="pics-empty" style="display:none">Aucune photo disponible pour le moment.</p>
+        </div>
+
+        <!-- Scroll theater: one fullscreen image per scroll step -->
+        <div class="pics-theater" id="pics-theater">
+            <div class="pics-theater-sticky" id="pics-theater-sticky">
+                <!-- slides injected by JS -->
+                <div class="pics-theater-hint" id="pics-theater-hint">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
+                    <span>Scroll</span>
+                </div>
+                <div class="pics-theater-counter" id="pics-theater-counter"></div>
+                <div class="pics-theater-progress" id="pics-theater-progress">
+                    <div class="pics-theater-progress-bar" id="pics-theater-progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="pics-lightbox" id="pics-lightbox" role="dialog" aria-modal="true">
+        <button class="pics-lightbox-close" id="pics-lb-close" aria-label="Fermer">&times;</button>
+        <img src="" alt="" id="pics-lb-img" />
+    </div>
+
     <script>
-			const ERROR_TRANSLATIONS = {
-			  fr: {
-				"invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
-				"no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
-				"has reached uptime limit": "Votre temps de connexion est épuisé.",
-				"has reached traffic limit": "Votre forfait internet est épuisé.",
-				"not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
-				"web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
-				"radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
-				"already authorizing": "Connexion déjà en cours, veuillez patienter.",
-				"cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
-				"you are not logged in": "Vous n’êtes pas connecté."
-			  },
+        (function initPicsSection() {
+            const grid       = document.getElementById('pics-grid');
+            const emptyMsg   = document.getElementById('pics-empty');
+            const lightbox   = document.getElementById('pics-lightbox');
+            const lbImg      = document.getElementById('pics-lb-img');
+            const lbClose    = document.getElementById('pics-lb-close');
+            const theater    = document.getElementById('pics-theater');
+            const sticky     = document.getElementById('pics-theater-sticky');
+            const counter    = document.getElementById('pics-theater-counter');
+            const hint       = document.getElementById('pics-theater-hint');
+            const progressBar = document.getElementById('pics-theater-progress-bar');
+            if (!grid) return;
 
-			  mg: {
-				"invalid username or password": "Diso ny anarana na ny teny miafina.",
-				"no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
-				"has reached uptime limit": "Efa tampitra ny fehim-potoana.",
-				"has reached traffic limit": "Lany ny data-nao.",
-				"not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
-				"web browser did not send challenge": "Misy olana kely, avereno indray.",
-				"radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
-				"already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
-				"cannot assign ip address": "Feno ny tambazotra.",
-				"you are not logged in": "Tsy tafiditra ianao."
-			  },
+            /* ── Lightbox ────────────────────────────────── */
+            function openLightbox(src, alt) {
+                lbImg.src = src; lbImg.alt = alt;
+                lightbox.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeLightbox() {
+                lightbox.classList.remove('is-open');
+                document.body.style.overflow = '';
+                setTimeout(() => { lbImg.src = ''; }, 300);
+            }
+            lbClose.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
+            });
 
-			  en: {
-				"invalid username or password": "Invalid username or password.",
-				"no more sessions are allowed": "This account is already in use.",
-				"has reached uptime limit": "Your time limit has been reached.",
-				"has reached traffic limit": "Your data limit has been reached.",
-				"not allowed to log in from this mac": "This account is not allowed on this device.",
-				"web browser did not send challenge": "Security error. Please refresh and try again.",
-				"radius server is not responding": "Authentication server is not responding.",
-				"already authorizing": "Authorization in progress. Please wait.",
-				"cannot assign ip address": "Network is full. No IP available.",
-				"you are not logged in": "You are not logged in."
-			  }
-			};
-			
+            /* ── Grid cards ──────────────────────────────── */
+            const gridObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('pics-item--visible');
+                        gridObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+            function createCard(src, index) {
+                const item = document.createElement('div');
+                item.className = 'pics-item';
+                item.style.transitionDelay = `${(index % 8) * 0.07}s`;
+                item.setAttribute('role', 'button');
+                item.setAttribute('tabindex', '0');
+                item.setAttribute('aria-label', `Voir photo ${index + 1}`);
+                const img = document.createElement('img');
+                img.className = 'pics-img';
+                img.alt = `Photo ${index + 1}`;
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.src = src;
+                img.onerror = () => { item.style.display = 'none'; };
+                item.appendChild(img);
+                item.addEventListener('click', () => openLightbox(src, `Photo ${index + 1}`));
+                item.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') openLightbox(src, `Photo ${index + 1}`);
+                });
+                grid.appendChild(item);
+                gridObserver.observe(item);
+            }
+
+            /* ── Theater (sticky scroll) ─────────────────── */
+            function buildTheater(srcs) {
+                if (!srcs.length || !theater || !sticky) return;
+
+                // One "scroll slot" per image = 100vh each
+                theater.style.height = srcs.length * 100 + 'vh';
+
+                const slides = srcs.map((src, i) => {
+                    const slide = document.createElement('div');
+                    slide.className = 'pics-theater-slide';
+                    const img = document.createElement('img');
+                    img.src  = src;
+                    img.alt  = `Photo ${i + 1}`;
+                    img.loading = i === 0 ? 'eager' : 'lazy';
+                    img.decoding = 'async';
+                    slide.appendChild(img);
+                    // insert before the UI overlays (hint, counter, progress)
+                    sticky.insertBefore(slide, hint);
+                    return slide;
+                });
+
+                let rafId = null;
+                let lastIdx = -1;
+
+                function tick() {
+                    rafId = null;
+                    const rect = theater.getBoundingClientRect();
+                    const scrolled = -rect.top;         // px scrolled into theater
+                    const slotH   = window.innerHeight;
+                    const maxScroll = theater.offsetHeight - slotH;
+
+                    // hide hint after first scroll step
+                    if (hint) hint.style.opacity = scrolled < slotH * 0.15 ? '1' : '0';
+
+                    // clamp raw progress: 0 … N-1
+                    const rawProgress = Math.max(0, Math.min(scrolled / slotH, srcs.length - 1));
+                    const curIdx = Math.round(rawProgress);
+
+                    // progress bar
+                    if (progressBar) {
+                        const pct = srcs.length > 1
+                            ? (rawProgress / (srcs.length - 1) * 100)
+                            : 100;
+                        progressBar.style.width = pct.toFixed(2) + '%';
+                    }
+
+                    // counter
+                    if (counter && curIdx !== lastIdx) {
+                        lastIdx = curIdx;
+                        counter.textContent = `${curIdx + 1} / ${srcs.length}`;
+                    }
+
+                    // per-slide opacity + transform
+                    slides.forEach((slide, i) => {
+                        const dist = rawProgress - i;          // negative = not yet, positive = past
+
+                        let opacity, scale, blur;
+
+                        if (dist <= -0.6 || dist >= 0.6) {
+                            // fully invisible
+                            opacity = 0;
+                            scale   = dist < 0 ? 0.94 : 1.06;
+                            blur    = 10;
+                        } else {
+                            // within the ±0.6 window → fade in/out
+                            const t = Math.abs(dist) / 0.6;  // 0 (center) → 1 (edge)
+                            const eased = t * t * (3 - 2 * t); // smoothstep
+                            opacity = 1 - eased;
+                            scale   = 1 + (dist >= 0 ? 1 : -1) * eased * 0.04;
+                            blur    = eased * 8;
+                        }
+
+                        slide.style.opacity   = opacity.toFixed(4);
+                        slide.style.transform = `scale(${scale.toFixed(4)})`;
+                        slide.style.filter    = blur > 0.3 ? `blur(${blur.toFixed(2)}px)` : 'none';
+                    });
+                }
+
+                window.addEventListener('scroll', () => {
+                    if (!rafId) rafId = requestAnimationFrame(tick);
+                }, { passive: true });
+
+                // initial render
+                requestAnimationFrame(tick);
+            }
+
+            /* ── Load images ─────────────────────────────── */
+            async function loadImages() {
+                let files = [];
+                try {
+                    const resp = await fetch('/PICS/');
+                    if (resp.ok) {
+                        const text = await resp.text();
+                        const doc  = new DOMParser().parseFromString(text, 'text/html');
+                        files = Array.from(doc.querySelectorAll('a[href]'))
+                            .map(a => a.getAttribute('href'))
+                            .filter(h => /\.(jpe?g|png|webp|gif)$/i.test(h))
+                            .map(h => h.split('/').filter(Boolean).pop())
+                            .sort((a, b) => {
+                                const na = parseInt(a, 10), nb = parseInt(b, 10);
+                                return (!isNaN(na) && !isNaN(nb)) ? na - nb : a.localeCompare(b);
+                            });
+                    }
+                } catch (_) {}
+
+                if (!files.length) { emptyMsg.style.display = 'block'; return; }
+
+                const srcs = files.map(f => `/PICS/${f}`);
+                srcs.forEach((src, i) => createCard(src, i));
+                buildTheater(srcs);
+            }
+
+            loadImages();
+        })();
+    </script>
+
+    <script>
+                        const ERROR_TRANSLATIONS = {
+                          fr: {
+                                "invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
+                                "no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
+                                "has reached uptime limit": "Votre temps de connexion est épuisé.",
+                                "has reached traffic limit": "Votre forfait internet est épuisé.",
+                                "not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
+                                "web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
+                                "radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
+                                "already authorizing": "Connexion déjà en cours, veuillez patienter.",
+                                "cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
+                                "you are not logged in": "Vous n’êtes pas connecté."
+                          },
+
+                          mg: {
+                                "invalid username or password": "Diso ny anarana na ny teny miafina.",
+                                "no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
+                                "has reached uptime limit": "Efa tampitra ny fehim-potoana.",
+                                "has reached traffic limit": "Lany ny data-nao.",
+                                "not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
+                                "web browser did not send challenge": "Misy olana kely, avereno indray.",
+                                "radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
+                                "already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
+                                "cannot assign ip address": "Feno ny tambazotra.",
+                                "you are not logged in": "Tsy tafiditra ianao."
+                          },
+
+                          en: {
+                                "invalid username or password": "Invalid username or password.",
+                                "no more sessions are allowed": "This account is already in use.",
+                                "has reached uptime limit": "Your time limit has been reached.",
+                                "has reached traffic limit": "Your data limit has been reached.",
+                                "not allowed to log in from this mac": "This account is not allowed on this device.",
+                                "web browser did not send challenge": "Security error. Please refresh and try again.",
+                                "radius server is not responding": "Authentication server is not responding.",
+                                "already authorizing": "Authorization in progress. Please wait.",
+                                "cannot assign ip address": "Network is full. No IP available.",
+                                "you are not logged in": "You are not logged in."
+                          }
+                        };
+                        
         const TRANSLATIONS = {
             fr: {
-			    fallback: "Basique",
+                            fallback: "Basique",
                 title: "WiFi De Tsararano",
                 subtitle: "à votre service",
                 username: "Nom d'utilisateur",
@@ -493,10 +706,11 @@ if (!sessionStorage.getItem("advertShown")) {
                 tutorialTitle: "Comment ça marche ?",
                 tutorialSubtitle: "Regardez ce court tutoriel pour vous connecter facilement",
                 muteLabel: "Activer le son",
-                unmuteLabel: "Couper le son"
+                unmuteLabel: "Couper le son",
+                picsSubtitle: "Nos moments en images"
             },
             mg: {
-			    fallback: "Tsotra",
+                            fallback: "Tsotra",
                 title: "WiFi De Tsararano",
                 subtitle: "nenao, nenakay, nentsika jiaby !",
                 username: "Anarana",
@@ -511,10 +725,11 @@ if (!sessionStorage.getItem("advertShown")) {
                 tutorialTitle: "Liana ve ianao?",
                 tutorialSubtitle: "Jereo ity sarimihetsika ity fa hanampy anao",
                 muteLabel: "Misy feony",
-                unmuteLabel: "WC"
+                unmuteLabel: "WC",
+                picsSubtitle: "Ny sary sy ny fotoana niarahantsika"
             },
             en: {
-			    fallback: "Basic",
+                            fallback: "Basic",
                 title: "WiFi De Tsararano",
                 subtitle: "Stay Connected",
                 username: "Username",
@@ -529,7 +744,8 @@ if (!sessionStorage.getItem("advertShown")) {
                 tutorialTitle: "How it works?",
                 tutorialSubtitle: "Watch this short tutorial to connect easily",
                 muteLabel: "Turn on sound",
-                unmuteLabel: "Mute sound"
+                unmuteLabel: "Mute sound",
+                picsSubtitle: "Our moments in pictures"
             }
         };
 
@@ -545,11 +761,11 @@ if (!sessionStorage.getItem("advertShown")) {
             // Header
             document.querySelector('.header h1').textContent = t.title;
             document.querySelector('.header p').textContent = t.subtitle;
-			// Mise à jour du texte du bouton de secours
-			const fallbackBtn = document.getElementById('fallback-btn');
-			if (fallbackBtn) {
-			fallbackBtn.textContent = t.fallback;
-			}
+                        // Mise à jour du texte du bouton de secours
+                        const fallbackBtn = document.getElementById('fallback-btn');
+                        if (fallbackBtn) {
+                        fallbackBtn.textContent = t.fallback;
+                        }
             // Form
             document.querySelector('input[name="username"]').placeholder = t.username;
             document.querySelector('input[name="password"]').placeholder = t.password;
@@ -571,6 +787,10 @@ if (!sessionStorage.getItem("advertShown")) {
             // Tutorial
             document.querySelector('.tutorial-title').textContent = t.tutorialTitle;
             document.querySelector('.tutorial-subtitle').textContent = t.tutorialSubtitle;
+
+            // PICS
+            const picsSubEl = document.getElementById('pics-subtitle');
+            if (picsSubEl && t.picsSubtitle) picsSubEl.textContent = t.picsSubtitle;
             
             // Video - change source without triggering autoplay
             const video = document.getElementById('tutorial-video');
@@ -597,36 +817,36 @@ if (!sessionStorage.getItem("advertShown")) {
             // Update theme prefixes indirectly by telling theme.js if needed, 
             // but we'll override the background logic here to support prefixes.
             updateBackgrounds(lang);
-			
-			translateErrorMessage(lang);
+                        
+                        translateErrorMessage(lang);
     
             localStorage.setItem('hotspot_lang', lang);
         }
         
-			function normalize(str) {
-			  return str
-				.toLowerCase()
-				.normalize("NFD")
-				.replace(/[\u0300-\u036f]/g, "");
-			}
+                        function normalize(str) {
+                          return str
+                                .toLowerCase()
+                                .normalize("NFD")
+                                .replace(/[\u0300-\u036f]/g, "");
+                        }
 
-			function translateErrorMessage(lang) {
-			  const errorDiv = document.querySelector('.error-msg');
-			  if (!errorDiv) return;
+                        function translateErrorMessage(lang) {
+                          const errorDiv = document.querySelector('.error-msg');
+                          if (!errorDiv) return;
 
-			  const original = normalize(errorDiv.textContent);
-			  const translations = ERROR_TRANSLATIONS[lang];
-			  if (!translations) return;
+                          const original = normalize(errorDiv.textContent);
+                          const translations = ERROR_TRANSLATIONS[lang];
+                          if (!translations) return;
 
-			  for (let key in translations) {
-				if (original.includes(normalize(key))) {
-				  errorDiv.textContent = translations[key];
-				  return;
-				}
-			  }
-			}
-		
-		
+                          for (let key in translations) {
+                                if (original.includes(normalize(key))) {
+                                  errorDiv.textContent = translations[key];
+                                  return;
+                                }
+                          }
+                        }
+                
+                
         function updateBackgrounds(lang) {
             const prefix = lang === 'fr' ? '' : lang + '-';
             const style = document.documentElement.style;
@@ -802,17 +1022,17 @@ if (!sessionStorage.getItem("advertShown")) {
                 }
             });
         }
-		
-		// Apparition du bouton de secours après 10 secondes
-		setTimeout(() => {
-		const btn = document.getElementById('fallback-btn');
-		if (btn) {
-		btn.style.display = 'block';
-		// Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
-		setTimeout(() => { btn.style.opacity = '1'; }, 50);
-		}
-		}, 30000); // 10 000 ms = 10 secondes
-		
+                
+                // Apparition du bouton de secours après 10 secondes
+                setTimeout(() => {
+                const btn = document.getElementById('fallback-btn');
+                if (btn) {
+                btn.style.display = 'block';
+                // Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
+                setTimeout(() => { btn.style.opacity = '1'; }, 50);
+                }
+                }, 30000); // 10 000 ms = 10 secondes
+                
     </script>
 
 </body>
