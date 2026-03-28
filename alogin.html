@@ -1,27 +1,33 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="2; url=$(link-redirect-esc)">
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="expires" content="-1">
-    <title>Internet hotspot - Redirect</title>
+    <title>WiFi De Tsararano - Connecté</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="theme.js"></script>
     <script>
-        function startClock() {
-            $(if popup == 'true')
-            open('$(link-status)', 'hotspot_status', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=290,height=200');
-        $(endif)
-        location.href = unescape('$(link-redirect-esc)');
-        }
+        // Parse MikroTik variables from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const LINK_REDIRECT = params.get('link-redirect') || params.get('link-orig') || '';
+        const LINK_STATUS   = params.get('link-status')   || '';
+        const POPUP         = params.get('popup')         || '';
 
-    </script> 
+        function startClock() {
+            if (POPUP === 'true' && LINK_STATUS) {
+                open(LINK_STATUS, 'hotspot_status', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=290,height=200');
+            }
+            if (LINK_REDIRECT) {
+                location.href = unescape(LINK_REDIRECT);
+            }
+        }
+    </script>
 </head>
 
-<body onLoad="startClock()">
+<body onload="startClock()">
     <div class="ie-fixMinHeight">
         <div class="main">
             <div class="wrap">

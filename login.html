@@ -15,30 +15,51 @@ if (!sessionStorage.getItem("advertShown")) {
     <title>WiFi De Tsararano - Connexion</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="theme.js"></script>
+    <script>
+        // Parse all MikroTik variables from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const CHAP_ID        = params.get('chap-id')        || '';
+        const CHAP_CHALLENGE = params.get('chap-challenge')  || '';
+        const LINK_LOGIN     = params.get('link-login-only') || '';
+        const LINK_ORIG      = params.get('link-orig')       || '';
+        const MAC            = params.get('mac')             || '';
+        const TRIAL          = params.get('trial')           || '';
+        const ERROR          = params.get('error')           || '';
+        const USERNAME_PARAM = params.get('username')        || '';
+    </script>
 </head>
 
 <a href="old/login.html" class="btn-old" id="fallback-btn" style="display: none; opacity: 0;">Basique</a>
 
 <body>
 
-    $(if chap-id)
-    <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
+    <!-- Hidden CHAP authentication form — action set dynamically from link-login-only param -->
+    <form name="sendin" action="" method="post" style="display:none">
         <input type="hidden" name="username" />
         <input type="hidden" name="password" />
-        <input type="hidden" name="dst" value="https://fr.pornhub.com/view_video.php?viewkey=69b7af059d512" />
+        <input type="hidden" name="dst" value="" />
         <input type="hidden" name="popup" value="true" />
     </form>
 
     <script src="/md5.js"></script>
     <script>
+        // Set the hidden form action and dst from URL params
+        document.sendin.action = LINK_LOGIN;
+        document.querySelector('form[name="sendin"] input[name="dst"]').value = LINK_ORIG;
+
         function doLogin() {
             document.sendin.username.value = document.login.username.value;
-            document.sendin.password.value = hexMD5('$(chap-id)' + document.login.password.value + '$(chap-challenge)');
+            if (CHAP_ID && CHAP_CHALLENGE) {
+                // CHAP/MD5 authentication when chap-id and chap-challenge are provided
+                document.sendin.password.value = hexMD5(CHAP_ID + document.login.password.value + CHAP_CHALLENGE);
+            } else {
+                // Fallback: plain password (no CHAP)
+                document.sendin.password.value = document.login.password.value;
+            }
             document.sendin.submit();
             return false;
         }
     </script>
-    $(endif)
 
     <div class="login-card">
         <div class="lang-selector">
@@ -61,43 +82,64 @@ if (!sessionStorage.getItem("advertShown")) {
             <p>à votre service</p>
         </div>
 
-        $(if error)
-        <div class="error-msg">
-            $(error)
+        <!-- Error message: shown only if 'error' param is present in URL -->
+        <div id="error-msg" class="error-msg" style="display:none;"></div>
+
+        <!-- Trial link: shown only if 'error' is empty and 'trial' == 'yes' -->
+        <div id="trial-msg" class="error-msg" style="display:none; background: rgba(0, 206, 209, 0.1); color: var(--accent-secondary); border-color: rgba(0, 206, 209, 0.2);">
+            Essai gratuit disponible, <a id="trial-link" href="#" class="trial-link">cliquez ici</a>.
         </div>
-        $(endif)
 
-        $(if error == "")
-            $(if trial == 'yes')
-            <div class="error-msg" style="background: rgba(0, 206, 209, 0.1); color: var(--accent-secondary); border-color: rgba(0, 206, 209, 0.2);">
-                Essai gratuit disponible, <a href="$(link-login-only)?dst=$(link-orig-esc)&amp;username=T-$(mac-esc)" class="trial-link">cliquez ici</a>.
-            </div>
-            $(endif)
-        $(endif)
+        <script>
+            // Show error message if present
+            if (ERROR) {
+                const errorDiv = document.getElementById('error-msg');
+                errorDiv.textContent = ERROR;
+                errorDiv.style.display = '';
+            } else if (TRIAL === 'yes') {
+                // Show trial link if no error and trial available
+                const trialDiv = document.getElementById('trial-msg');
+                const trialLink = document.getElementById('trial-link');
+                const trialUrl = LINK_LOGIN + '?dst=' + encodeURIComponent(LINK_ORIG) + '&username=T-' + encodeURIComponent(MAC);
+                trialLink.href = trialUrl;
+                trialDiv.style.display = '';
+            }
+        </script>
 
-        <form name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()" $(endif)>
-            <input type="hidden" name="dst" value="$(link-orig)" />
+        <!-- Main login form — action and dst set dynamically -->
+        <form name="login" action="" method="post" onSubmit="return doLogin()">
+            <input type="hidden" name="dst" value="" />
             <input type="hidden" name="popup" value="true" />
 
             <div class="input-group">
-                <input name="username" type="text" value="$(username)" placeholder="Nom d'utilisateur" required autocomplete="username" />
+                <input name="username" type="text" value="" placeholder="Nom d'utilisateur" required autocomplete="username" />
             </div>
 
-                        <div class="input-group password-group">
-                          <input id="password-input" name="password" type="password" placeholder="Mot de passe" required autocomplete="current-password" />
-                          <button type="button" class="toggle-password" id="toggle-password"
-                                          aria-label="Afficher ou masquer le mot de passe" aria-pressed="false">
-                                <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true">
-                                  <path d="M12 5c-5.5 0-9.5 5.2-10 6.7.5 1.5 4.5 6.3 10 6.3s9.5-4.8 10-6.3C21.5 10.2 17.5 5 12 5zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                                </svg>
-                                <svg class="eye-closed" viewBox="0 0 24 24" aria-hidden="true">
-                                  <path d="M2 4.3 3.3 3 21 20.7 19.7 22l-3-3c-1.4.6-3 .9-4.7.9-5.5 0-9.5-4.8-10-6.3.2-.6.9-1.8 2-3.1L2 4.3zM12 7c1.6 0 3.1.3 4.4 1l-1.7 1.7A3 3 0 0 0 10.7 13L8.9 14.8C8.3 14 8 13 8 12a4 4 0 0 1 4-4zm10 5c-.3.9-1.6 2.9-3.7 4.4l-2-2c.5-.7.7-1.5.7-2.4 0-.5-.1-1-.3-1.5l3.1-3.1c1.2 1.3 1.9 2.5 2.2 3.2z"/>
-                                </svg>
-                          </button>
-                        </div>
+            <div class="input-group password-group">
+                <input id="password-input" name="password" type="password" placeholder="Mot de passe" required autocomplete="current-password" />
+                <button type="button" class="toggle-password" id="toggle-password"
+                        aria-label="Afficher ou masquer le mot de passe" aria-pressed="false">
+                    <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 5c-5.5 0-9.5 5.2-10 6.7.5 1.5 4.5 6.3 10 6.3s9.5-4.8 10-6.3C21.5 10.2 17.5 5 12 5zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                    </svg>
+                    <svg class="eye-closed" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 4.3 3.3 3 21 20.7 19.7 22l-3-3c-1.4.6-3 .9-4.7.9-5.5 0-9.5-4.8-10-6.3.2-.6.9-1.8 2-3.1L2 4.3zM12 7c1.6 0 3.1.3 4.4 1l-1.7 1.7A3 3 0 0 0 10.7 13L8.9 14.8C8.3 14 8 13 8 12a4 4 0 0 1 4-4zm10 5c-.3.9-1.6 2.9-3.7 4.4l-2-2c.5-.7.7-1.5.7-2.4 0-.5-.1-1-.3-1.5l3.1-3.1c1.2 1.3 1.9 2.5 2.2 3.2z"/>
+                    </svg>
+                </button>
+            </div>
 
             <button type="submit" class="btn-submit">Se connecter</button>
         </form>
+
+        <script>
+            // Set form action and dst from URL params
+            document.login.action = LINK_LOGIN;
+            document.querySelector('form[name="login"] input[name="dst"]').value = LINK_ORIG;
+            // Pre-fill username if provided in URL
+            if (USERNAME_PARAM) {
+                document.querySelector('form[name="login"] input[name="username"]').value = USERNAME_PARAM;
+            }
+        </script>
 
         <button type="button" class="btn-qr" id="scan-btn">
             <svg class="qr-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm10 0h2v2h-2v-2zm2-2h2v2h-2v-2zm0 4h2v2h-2v-2zm2-2h2v2h-2v-2zm0-4h2v2h-2v-2zm-8-2h2v2h-2v-2zm2 2h2v2h-2v-2zm2-2h2v2h-2v-2zm0 2h2v2h-2v-2z"/></svg>
@@ -119,9 +161,6 @@ if (!sessionStorage.getItem("advertShown")) {
 
     <script src="html5-qrcode.min.js"></script>
     <script>
-        // Optional configuration:
-        // - You can define `window.SCAN_URL = "https://example.com/login";` before this script
-        //   to control what "Copier le lien" copies.
         document.addEventListener('DOMContentLoaded', () => {
             const scanBtn = document.getElementById('scan-btn');
             const reader = document.getElementById('reader');
@@ -130,25 +169,23 @@ if (!sessionStorage.getItem("advertShown")) {
             const scannerError = document.getElementById('scanner-error');
             const fallbackInput = document.getElementById('fallback-url-input');
             const usernameInput = document.querySelector('form[name="login"] input[name="username"][type="text"]');
-                        const passwordInput = document.getElementById('password-input');
-                          const togglePasswordBtn = document.getElementById('toggle-password');
+            const passwordInput = document.getElementById('password-input');
+            const togglePasswordBtn = document.getElementById('toggle-password');
 
-                          if (togglePasswordBtn && passwordInput) {
-                                togglePasswordBtn.addEventListener('click', (e) => {
-                                  e.preventDefault();
+            if (togglePasswordBtn && passwordInput) {
+                togglePasswordBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const show = passwordInput.type === 'password';
+                    passwordInput.type = show ? 'text' : 'password';
+                    togglePasswordBtn.classList.toggle('is-visible', show);
+                    togglePasswordBtn.setAttribute('aria-pressed', String(show));
+                    passwordInput.focus();
+                    const len = passwordInput.value.length;
+                    passwordInput.setSelectionRange(len, len);
+                });
+            }
 
-                                  const show = passwordInput.type === 'password';
-                                  passwordInput.type = show ? 'text' : 'password';
-                                  togglePasswordBtn.classList.toggle('is-visible', show);
-                                  togglePasswordBtn.setAttribute('aria-pressed', String(show));
-
-                                  passwordInput.focus();
-                                  const len = passwordInput.value.length;
-                                  passwordInput.setSelectionRange(len, len);
-                                });
-                          }
-
-            // Avoid focusing the username field on page load (keeps the screen clean until user interaction)
+            // Avoid focusing the username field on page load
             setTimeout(() => {
                 const active = document.activeElement;
                 if (active && active.tagName === 'INPUT') {
@@ -184,7 +221,6 @@ if (!sessionStorage.getItem("advertShown")) {
                 scannerError.textContent = msg;
                 scannerError.style.display = 'block';
                 copySection.style.display = 'flex';
-                // Provide the URL in the fallback field if clipboard permissions fail
                 fallbackInput.value = SCAN_URL;
             }
 
@@ -201,13 +237,10 @@ if (!sessionStorage.getItem("advertShown")) {
             async function safeStopQr() {
                 clearStartTimeout();
                 isStarting = false;
-
                 if (!html5QrCode) return;
                 try {
                     await html5QrCode.stop();
-                } catch (_) {
-                    // ignore
-                }
+                } catch (_) {}
             }
 
             function onScanSuccess(decodedText) {
@@ -228,15 +261,14 @@ if (!sessionStorage.getItem("advertShown")) {
             async function startScanner() {
                 hideError();
 
-                // Security / capability checks
                 if (!window.isSecureContext) {
-                    showError("Le scan caméra nécessite une connexion sécurisée. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.");
+                    showError("Le scan caméra nécessite une connexion sécurisée. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.");
                     resetScannerUI();
                     return;
                 }
 
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    showError("L'accès à la caméra n'est pas supporté ici. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.");
+                    showError("L'accès à la caméra n'est pas supporté ici. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.");
                     resetScannerUI();
                     return;
                 }
@@ -246,7 +278,6 @@ if (!sessionStorage.getItem("advertShown")) {
                 setScanBtnLabel('Démarrage…');
 
                 try {
-                    // Probe camera access first, then STOP the test stream to avoid locking the camera
                     const probeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                     probeStream.getTracks().forEach(t => t.stop());
 
@@ -282,9 +313,9 @@ if (!sessionStorage.getItem("advertShown")) {
                     let errorMsg = "Erreur d'accès à la caméra.";
 
                     if (err && err.name === 'StartTimeout') {
-                        errorMsg = "Le démarrage du scanner prend trop de temps. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.";
+                        errorMsg = "Le démarrage du scanner prend trop de temps. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.";
                     } else if (err && err.name === 'NotAllowedError') {
-                        errorMsg = "Accès à la caméra refusé ou indisponible ici. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.";
+                        errorMsg = "Accès à la caméra refusé ou indisponible ici. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.";
                     } else if (err && err.name === 'NotFoundError') {
                         errorMsg = "Aucune caméra détectée.";
                     } else if (err && err.name === 'NotReadableError') {
@@ -292,7 +323,6 @@ if (!sessionStorage.getItem("advertShown")) {
                     } else if (err && err.name === 'OverconstrainedError') {
                         errorMsg = "Caméra arrière indisponible, essayez une autre caméra.";
                     }
-					
 
                     showError(errorMsg);
                     await safeStopQr();
@@ -307,7 +337,6 @@ if (!sessionStorage.getItem("advertShown")) {
 
             function copyToClipboard() {
                 const url = SCAN_URL;
-
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(url).then(() => {
                         const originalText = copyBtn.textContent;
@@ -341,10 +370,8 @@ if (!sessionStorage.getItem("advertShown")) {
                 usernameInput.setSelectionRange(len, len);
             }
 
-            // Scanner button
             if (scanBtn) {
                 scanBtn.addEventListener('click', () => {
-                    // Allow cancel even during "starting"
                     if (reader.style.display === 'block') {
                         stopScanner();
                     } else {
@@ -353,12 +380,10 @@ if (!sessionStorage.getItem("advertShown")) {
                 });
             }
 
-            // Copy link button
             if (copyBtn) {
                 copyBtn.addEventListener('click', copyToClipboard);
             }
 
-            // Tariff selection (robust via data-prefix)
             document.querySelectorAll('.price-card[data-prefix]').forEach(card => {
                 card.addEventListener('click', () => {
                     const prefix = card.getAttribute('data-prefix') || '';
@@ -371,13 +396,12 @@ if (!sessionStorage.getItem("advertShown")) {
     <div class="price-section">
         <h2 class="price-title">Nos Tarifs</h2>
                 
-                
         <div class="price-card" data-prefix="AB-">
             <span class="price-time">1 mois</span>
             <span class="price-amount">30 000 Ar</span>
         </div>
         
-                <div class="price-card" data-prefix="24h-">
+        <div class="price-card" data-prefix="24h-">
             <span class="price-time">24h</span>
             <span class="price-amount">3 000 Ar</span>
         </div>
@@ -435,50 +459,48 @@ if (!sessionStorage.getItem("advertShown")) {
     </section>
 
     <script>
-			const ERROR_TRANSLATIONS = {
-			  fr: {
-				"invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
-				"no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
-				"has reached uptime limit": "Votre temps de connexion est épuisé.",
-				"has reached traffic limit": "Votre forfait internet est épuisé.",
-				"not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
-				"web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
-				"radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
-				"already authorizing": "Connexion déjà en cours, veuillez patienter.",
-				"cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
-				"you are not logged in": "Vous n’êtes pas connecté."
-			  },
-
-			  mg: {
-				"invalid username or password": "Diso ny anarana na ny teny miafina.",
-				"no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
-				"has reached uptime limit": "Efa tampitra ny fehim-potoana.",
-				"has reached traffic limit": "Lany ny data-nao.",
-				"not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
-				"web browser did not send challenge": "Misy olana kely, avereno indray.",
-				"radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
-				"already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
-				"cannot assign ip address": "Feno ny tambazotra.",
-				"you are not logged in": "Tsy tafiditra ianao."
-			  },
-
-			  en: {
-				"invalid username or password": "Invalid username or password.",
-				"no more sessions are allowed": "This account is already in use.",
-				"has reached uptime limit": "Your time limit has been reached.",
-				"has reached traffic limit": "Your data limit has been reached.",
-				"not allowed to log in from this mac": "This account is not allowed on this device.",
-				"web browser did not send challenge": "Security error. Please refresh and try again.",
-				"radius server is not responding": "Authentication server is not responding.",
-				"already authorizing": "Authorization in progress. Please wait.",
-				"cannot assign ip address": "Network is full. No IP available.",
-				"you are not logged in": "You are not logged in."
-			  }
-			};
-			
+        const ERROR_TRANSLATIONS = {
+            fr: {
+                "invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
+                "no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
+                "has reached uptime limit": "Votre temps de connexion est épuisé.",
+                "has reached traffic limit": "Votre forfait internet est épuisé.",
+                "not allowed to log in from this mac": "Ce compte n'est pas autorisé sur cet appareil.",
+                "web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
+                "radius server is not responding": "Serveur d'authentification indisponible. Réessayez plus tard.",
+                "already authorizing": "Connexion déjà en cours, veuillez patienter.",
+                "cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
+                "you are not logged in": "Vous n'êtes pas connecté."
+            },
+            mg: {
+                "invalid username or password": "Diso ny anarana na ny teny miafina.",
+                "no more sessions are allowed": "Efa ampiasaina amin'ny fitaovana hafa ity kaonty ity.",
+                "has reached uptime limit": "Efa tampitra ny fehim-potoana.",
+                "has reached traffic limit": "Lany ny data-nao.",
+                "not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
+                "web browser did not send challenge": "Misy olana kely, avereno indray.",
+                "radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
+                "already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
+                "cannot assign ip address": "Feno ny tambazotra.",
+                "you are not logged in": "Tsy tafiditra ianao."
+            },
+            en: {
+                "invalid username or password": "Invalid username or password.",
+                "no more sessions are allowed": "This account is already in use.",
+                "has reached uptime limit": "Your time limit has been reached.",
+                "has reached traffic limit": "Your data limit has been reached.",
+                "not allowed to log in from this mac": "This account is not allowed on this device.",
+                "web browser did not send challenge": "Security error. Please refresh and try again.",
+                "radius server is not responding": "Authentication server is not responding.",
+                "already authorizing": "Authorization in progress. Please wait.",
+                "cannot assign ip address": "Network is full. No IP available.",
+                "you are not logged in": "You are not logged in."
+            }
+        };
+        
         const TRANSLATIONS = {
             fr: {
-			    fallback: "Basique",
+                fallback: "Basique",
                 title: "WiFi De Tsararano",
                 subtitle: "à votre service",
                 username: "Nom d'utilisateur",
@@ -496,7 +518,7 @@ if (!sessionStorage.getItem("advertShown")) {
                 unmuteLabel: "Couper le son"
             },
             mg: {
-			    fallback: "Tsotra",
+                fallback: "Tsotra",
                 title: "WiFi De Tsararano",
                 subtitle: "nenao, nenakay, nentsika jiaby !",
                 username: "Anarana",
@@ -514,7 +536,7 @@ if (!sessionStorage.getItem("advertShown")) {
                 unmuteLabel: "WC"
             },
             en: {
-			    fallback: "Basic",
+                fallback: "Basic",
                 title: "WiFi De Tsararano",
                 subtitle: "Stay Connected",
                 username: "Username",
@@ -542,37 +564,30 @@ if (!sessionStorage.getItem("advertShown")) {
             document.documentElement.lang = lang;
             document.getElementById('lang-current').textContent = LANG_FLAGS[lang];
 
-            // Header
             document.querySelector('.header h1').textContent = t.title;
             document.querySelector('.header p').textContent = t.subtitle;
-			// Mise à jour du texte du bouton de secours
-			const fallbackBtn = document.getElementById('fallback-btn');
-			if (fallbackBtn) {
-			fallbackBtn.textContent = t.fallback;
-			}
-            // Form
+            const fallbackBtn = document.getElementById('fallback-btn');
+            if (fallbackBtn) {
+                fallbackBtn.textContent = t.fallback;
+            }
             document.querySelector('input[name="username"]').placeholder = t.username;
             document.querySelector('input[name="password"]').placeholder = t.password;
             document.querySelector('.btn-submit').textContent = t.login;
 
-            // QR & Copy
             const scanBtn = document.getElementById('scan-btn');
             const svg = scanBtn.querySelector('svg').outerHTML;
             scanBtn.innerHTML = svg + ' ' + t.scan;
             document.querySelector('.copy-info').textContent = t.copyInfo;
             document.getElementById('copy-btn').textContent = t.copyBtn;
 
-            // Tariffs
             document.querySelector('.price-title').textContent = t.tariffs;
             const priceCards = document.querySelectorAll('.price-card');
             priceCards[0].querySelector('.price-time').textContent = t.month;
             priceCards[1].querySelector('.price-time').textContent = t.day;
 
-            // Tutorial
             document.querySelector('.tutorial-title').textContent = t.tutorialTitle;
             document.querySelector('.tutorial-subtitle').textContent = t.tutorialSubtitle;
             
-            // Video - change source without triggering autoplay
             const video = document.getElementById('tutorial-video');
             if (video) {
                 const source = video.querySelector('source');
@@ -591,50 +606,36 @@ if (!sessionStorage.getItem("advertShown")) {
                 }
             }
 
-            // LocalStorage
             localStorage.setItem('hotspot_lang', lang);
-
-            // Update theme prefixes indirectly by telling theme.js if needed, 
-            // but we'll override the background logic here to support prefixes.
             updateBackgrounds(lang);
-			
-			translateErrorMessage(lang);
-    
-            localStorage.setItem('hotspot_lang', lang);
+            translateErrorMessage(lang);
         }
         
-			function normalize(str) {
-			  return str
-				.toLowerCase()
-				.normalize("NFD")
-				.replace(/[\u0300-\u036f]/g, "");
-			}
+        function normalize(str) {
+            return str
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
 
-			function translateErrorMessage(lang) {
-			  const errorDiv = document.querySelector('.error-msg');
-			  if (!errorDiv) return;
+        function translateErrorMessage(lang) {
+            const errorDiv = document.getElementById('error-msg');
+            if (!errorDiv || errorDiv.style.display === 'none') return;
 
-			  const original = normalize(errorDiv.textContent);
-			  const translations = ERROR_TRANSLATIONS[lang];
-			  if (!translations) return;
+            const original = normalize(errorDiv.textContent);
+            const translations = ERROR_TRANSLATIONS[lang];
+            if (!translations) return;
 
-			  for (let key in translations) {
-				if (original.includes(normalize(key))) {
-				  errorDiv.textContent = translations[key];
-				  return;
-				}
-			  }
-			}
-		
-		
+            for (let key in translations) {
+                if (original.includes(normalize(key))) {
+                    errorDiv.textContent = translations[key];
+                    return;
+                }
+            }
+        }
+        
         function updateBackgrounds(lang) {
             const prefix = lang === 'fr' ? '' : lang + '-';
-            const style = document.documentElement.style;
-            
-            // We need to override the CSS variables used for backgrounds
-            // However, the actual background is applied in body::after using var(--bg-image)
-            // which is set by [data-theme] in style.css.
-            // To be truly dynamic with prefixes, we can inject a style tag.
             
             let langStyle = document.getElementById('lang-background-overrides');
             if (!langStyle) {
@@ -662,29 +663,7 @@ if (!sessionStorage.getItem("advertShown")) {
             });
         });
 
-        // Radiant effect color animation with smooth transitions
-       // const radiantColors = [
-       //     { primary: '#8a2be2', secondary: '#00ced1', rgb1: '138, 43, 226', rgb2: '0, 206, 209' },
-       //     { primary: '#ff4f7b', secondary: '#ff9b2f', rgb1: '255, 79, 123', rgb2: '255, 155, 47' },
-       //     { primary: '#2b6de2', secondary: '#38d6ff', rgb1: '43, 109, 226', rgb2: '56, 214, 255' },
-       //     { primary: '#ff8a00', secondary: '#00c2ff', rgb1: '255, 138, 0', rgb2: '0, 194, 255' }
-       // ];
-        
-       // let colorIndex = 0;
-      //  function rotateRadiantColors() {
-       //     colorIndex = (colorIndex + 1) % radiantColors.length;
-        //    const colors = radiantColors[colorIndex];
-        //    const style = document.documentElement.style;
-         //   style.setProperty('--radiant-primary', colors.primary);
-        //    style.setProperty('--radiant-secondary', colors.secondary);
-         //   style.setProperty('--radiant-primary-rgb', colors.rgb1);
-         //   style.setProperty('--radiant-secondary-rgb', colors.rgb2);
-       // }
-        
-        // setInterval(rotateRadiantColors, 2000);
-        // rotateRadiantColors();
-
-        // Scroll-based background fade effect - more progressive and smooth
+        // Scroll-based background fade effect
         let lastScrollY = 0;
         const maxScroll = window.innerHeight * 4.5;
         
@@ -692,9 +671,7 @@ if (!sessionStorage.getItem("advertShown")) {
             const scrollY = window.scrollY;
             lastScrollY = scrollY;
             
-            // More gradual fade using cubic easing for smoother transition
             const ratio = Math.min(scrollY / maxScroll, 1);
-            // Apply cubic easing: 3t² - 2t³ for smoother acceleration
             const eased = ratio < 0.5 
                 ? 2 * ratio * ratio 
                 : 1 - Math.pow(-2 * ratio + 2, 2) / 2;
@@ -709,26 +686,18 @@ if (!sessionStorage.getItem("advertShown")) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        // Auto-play video with fallback for Safari/iOS
                         const playPromise = video.play();
                         if (playPromise !== undefined) {
                             playPromise
-                                .then(() => {
-                                    video.classList.add('video-playing');
-                                })
-                                .catch(err => {
-                                    console.log('Autoplay prevented, user interaction required:', err);
-                                    // Video will require user interaction
-                                });
+                                .then(() => { video.classList.add('video-playing'); })
+                                .catch(err => { console.log('Autoplay prevented:', err); });
                         }
                     } else {
                         video.pause();
                         video.classList.remove('video-playing');
                     }
                 });
-            }, {
-                threshold: 0.3
-            });
+            }, { threshold: 0.3 });
 
             observer.observe(video);
 
@@ -741,16 +710,13 @@ if (!sessionStorage.getItem("advertShown")) {
                 });
             }
             
-            // Allow manual play on click/tap for iOS compatibility (if autoplay fails)
             video.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (video.paused) {
                     const playPromise = video.play();
                     if (playPromise !== undefined) {
                         playPromise
-                            .then(() => {
-                                video.classList.add('video-playing');
-                            })
+                            .then(() => { video.classList.add('video-playing'); })
                             .catch(err => console.log('Manual play error:', err));
                     }
                 } else {
@@ -767,7 +733,6 @@ if (!sessionStorage.getItem("advertShown")) {
         const langCurrent = document.querySelector('.lang-current');
         const langOptions = document.querySelectorAll('.lang-option');
 
-        // Check if device supports touch
         const isTouchDevice = () => {
             return (('ontouchstart' in window) ||
                     (navigator.maxTouchPoints > 0) ||
@@ -776,14 +741,12 @@ if (!sessionStorage.getItem("advertShown")) {
 
         const isTouch = isTouchDevice();
 
-        // Toggle menu on touch devices
         if (isTouch && langCurrent) {
             langCurrent.addEventListener('click', (e) => {
                 e.stopPropagation();
                 langSelector.classList.toggle('active');
             });
 
-            // Close menu when a language is selected
             langOptions.forEach(option => {
                 option.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -795,24 +758,21 @@ if (!sessionStorage.getItem("advertShown")) {
                 });
             });
 
-            // Close menu when clicking outside
             document.addEventListener('click', (e) => {
                 if (!langSelector.contains(e.target)) {
                     langSelector.classList.remove('active');
                 }
             });
         }
-		
-		// Apparition du bouton de secours après 10 secondes
-		setTimeout(() => {
-		const btn = document.getElementById('fallback-btn');
-		if (btn) {
-		btn.style.display = 'block';
-		// Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
-		setTimeout(() => { btn.style.opacity = '1'; }, 50);
-		}
-		}, 30000); // 10 000 ms = 10 secondes
-		
+                
+        // Show fallback button after 30 seconds
+        setTimeout(() => {
+            const btn = document.getElementById('fallback-btn');
+            if (btn) {
+                btn.style.display = 'block';
+                setTimeout(() => { btn.style.opacity = '1'; }, 50);
+            }
+        }, 30000);
     </script>
 
 </body>
