@@ -1023,6 +1023,260 @@ table td:last-child {
     }
 }
 
+/* ═══════════════════════════════════════════
+   MVOLA PAYMENT MODAL
+   ═══════════════════════════════════════════ */
+
+.mvola-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.mvola-modal-overlay.is-open {
+    display: flex;
+    animation: modalFadeIn 0.25s ease;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.mvola-modal-card {
+    background: #ffffff;
+    color: #111111;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 360px;
+    padding: 32px 28px 28px;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+    animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(30px) scale(0.96); opacity: 0; }
+    to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+.mvola-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+}
+.mvola-close-btn:hover {
+    background: #f0f0f0;
+    color: #111;
+}
+
+.mvola-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 18px;
+    color: #111;
+}
+
+.mvola-plan-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+}
+
+.mvola-plan-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+}
+
+.mvola-plan-price {
+    font-size: 17px;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: -0.5px;
+}
+
+.mvola-choose-label {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.mvola-method-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.mvola-method-btn:hover {
+    border-color: #111;
+    background: #fafafa;
+    transform: translateY(-1px);
+}
+.mvola-method-btn:active {
+    transform: translateY(0);
+}
+
+.mvola-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #00A651;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+}
+
+.mvola-phone-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: modalFadeIn 0.2s ease;
+}
+
+.mvola-phone-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+}
+
+.mvola-phone-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
+    color: #111;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.5px;
+}
+.mvola-phone-input:focus {
+    border-color: #111;
+}
+.mvola-phone-input::placeholder {
+    color: #bbb;
+    letter-spacing: 0;
+}
+
+.mvola-error-msg {
+    font-size: 13px;
+    color: #cc0000;
+    background: #fff0f0;
+    border: 1px solid #ffcccc;
+    border-radius: 8px;
+    padding: 10px 12px;
+    line-height: 1.4;
+}
+
+.mvola-pay-btn {
+    width: 100%;
+    padding: 16px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s, transform 0.15s, opacity 0.2s;
+    margin-top: 4px;
+}
+.mvola-pay-btn:hover {
+    background: #333;
+    transform: translateY(-1px);
+}
+.mvola-pay-btn:active {
+    transform: translateY(0);
+}
+.mvola-pay-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.mvola-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.mvola-loading-msg {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    line-height: 1.5;
+    padding: 0 4px;
+}
+
+.mvola-back-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #888;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: underline;
+    text-align: center;
+    padding: 4px;
+    align-self: center;
+}
+.mvola-back-btn:hover {
+    color: #444;
+}
+
+/* ═══════════════════════════════════════════ */
+
 @media (max-width: 480px) {
     .phone-frame {
         max-width: 240px;

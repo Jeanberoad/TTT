@@ -292,7 +292,7 @@ if (!sessionStorage.getItem("advertShown")) {
                     } else if (err && err.name === 'OverconstrainedError') {
                         errorMsg = "Caméra arrière indisponible, essayez une autre caméra.";
                     }
-					
+                                        
 
                     showError(errorMsg);
                     await safeStopQr();
@@ -358,11 +358,23 @@ if (!sessionStorage.getItem("advertShown")) {
                 copyBtn.addEventListener('click', copyToClipboard);
             }
 
-            // Tariff selection (robust via data-prefix)
+            // Tariff selection — open MVola modal
+            const PLAN_DATA = {
+                'AB-':    { name: '1 mois',     price: '30 000 Ar', planId: 'AB'    },
+                '24h-':   { name: '24 heures',  price: '3 000 Ar',  planId: '24h'   },
+                '1h30m-': { name: '1h 30m',     price: '1 000 Ar',  planId: '1h30m' },
+                '30m-':   { name: '30 minutes', price: '500 Ar',    planId: '30m'   }
+            };
+
             document.querySelectorAll('.price-card[data-prefix]').forEach(card => {
                 card.addEventListener('click', () => {
                     const prefix = card.getAttribute('data-prefix') || '';
-                    if (prefix) setPrefix(prefix);
+                    const plan = PLAN_DATA[prefix];
+                    if (plan) {
+                        openMVolaModal(plan);
+                    } else if (prefix) {
+                        setPrefix(prefix);
+                    }
                 });
             });
         });
@@ -435,50 +447,50 @@ if (!sessionStorage.getItem("advertShown")) {
     </section>
 
     <script>
-			const ERROR_TRANSLATIONS = {
-			  fr: {
-				"invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
-				"no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
-				"has reached uptime limit": "Votre temps de connexion est épuisé.",
-				"has reached traffic limit": "Votre forfait internet est épuisé.",
-				"not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
-				"web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
-				"radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
-				"already authorizing": "Connexion déjà en cours, veuillez patienter.",
-				"cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
-				"you are not logged in": "Vous n’êtes pas connecté."
-			  },
+                        const ERROR_TRANSLATIONS = {
+                          fr: {
+                                "invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
+                                "no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
+                                "has reached uptime limit": "Votre temps de connexion est épuisé.",
+                                "has reached traffic limit": "Votre forfait internet est épuisé.",
+                                "not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
+                                "web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
+                                "radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
+                                "already authorizing": "Connexion déjà en cours, veuillez patienter.",
+                                "cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
+                                "you are not logged in": "Vous n’êtes pas connecté."
+                          },
 
-			  mg: {
-				"invalid username or password": "Diso ny anarana na ny teny miafina.",
-				"no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
-				"has reached uptime limit": "Efa tampitra ny fehim-potoana.",
-				"has reached traffic limit": "Lany ny data-nao.",
-				"not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
-				"web browser did not send challenge": "Misy olana kely, avereno indray.",
-				"radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
-				"already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
-				"cannot assign ip address": "Feno ny tambazotra.",
-				"you are not logged in": "Tsy tafiditra ianao."
-			  },
+                          mg: {
+                                "invalid username or password": "Diso ny anarana na ny teny miafina.",
+                                "no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
+                                "has reached uptime limit": "Efa tampitra ny fehim-potoana.",
+                                "has reached traffic limit": "Lany ny data-nao.",
+                                "not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
+                                "web browser did not send challenge": "Misy olana kely, avereno indray.",
+                                "radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
+                                "already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
+                                "cannot assign ip address": "Feno ny tambazotra.",
+                                "you are not logged in": "Tsy tafiditra ianao."
+                          },
 
-			  en: {
-				"invalid username or password": "Invalid username or password.",
-				"no more sessions are allowed": "This account is already in use.",
-				"has reached uptime limit": "Your time limit has been reached.",
-				"has reached traffic limit": "Your data limit has been reached.",
-				"not allowed to log in from this mac": "This account is not allowed on this device.",
-				"web browser did not send challenge": "Security error. Please refresh and try again.",
-				"radius server is not responding": "Authentication server is not responding.",
-				"already authorizing": "Authorization in progress. Please wait.",
-				"cannot assign ip address": "Network is full. No IP available.",
-				"you are not logged in": "You are not logged in."
-			  }
-			};
-			
+                          en: {
+                                "invalid username or password": "Invalid username or password.",
+                                "no more sessions are allowed": "This account is already in use.",
+                                "has reached uptime limit": "Your time limit has been reached.",
+                                "has reached traffic limit": "Your data limit has been reached.",
+                                "not allowed to log in from this mac": "This account is not allowed on this device.",
+                                "web browser did not send challenge": "Security error. Please refresh and try again.",
+                                "radius server is not responding": "Authentication server is not responding.",
+                                "already authorizing": "Authorization in progress. Please wait.",
+                                "cannot assign ip address": "Network is full. No IP available.",
+                                "you are not logged in": "You are not logged in."
+                          }
+                        };
+                        
         const TRANSLATIONS = {
             fr: {
-			    fallback: "Basique",
+                            fallback: "Basique",
                 title: "WiFi De Tsararano",
                 subtitle: "à votre service",
                 username: "Nom d'utilisateur",
@@ -496,7 +508,7 @@ if (!sessionStorage.getItem("advertShown")) {
                 unmuteLabel: "Couper le son"
             },
             mg: {
-			    fallback: "Tsotra",
+                            fallback: "Tsotra",
                 title: "WiFi De Tsararano",
                 subtitle: "nenao, nenakay, nentsika jiaby !",
                 username: "Anarana",
@@ -514,7 +526,7 @@ if (!sessionStorage.getItem("advertShown")) {
                 unmuteLabel: "WC"
             },
             en: {
-			    fallback: "Basic",
+                            fallback: "Basic",
                 title: "WiFi De Tsararano",
                 subtitle: "Stay Connected",
                 username: "Username",
@@ -545,11 +557,11 @@ if (!sessionStorage.getItem("advertShown")) {
             // Header
             document.querySelector('.header h1').textContent = t.title;
             document.querySelector('.header p').textContent = t.subtitle;
-			// Mise à jour du texte du bouton de secours
-			const fallbackBtn = document.getElementById('fallback-btn');
-			if (fallbackBtn) {
-			fallbackBtn.textContent = t.fallback;
-			}
+                        // Mise à jour du texte du bouton de secours
+                        const fallbackBtn = document.getElementById('fallback-btn');
+                        if (fallbackBtn) {
+                        fallbackBtn.textContent = t.fallback;
+                        }
             // Form
             document.querySelector('input[name="username"]').placeholder = t.username;
             document.querySelector('input[name="password"]').placeholder = t.password;
@@ -597,36 +609,36 @@ if (!sessionStorage.getItem("advertShown")) {
             // Update theme prefixes indirectly by telling theme.js if needed, 
             // but we'll override the background logic here to support prefixes.
             updateBackgrounds(lang);
-			
-			translateErrorMessage(lang);
+                        
+                        translateErrorMessage(lang);
     
             localStorage.setItem('hotspot_lang', lang);
         }
         
-			function normalize(str) {
-			  return str
-				.toLowerCase()
-				.normalize("NFD")
-				.replace(/[\u0300-\u036f]/g, "");
-			}
+                        function normalize(str) {
+                          return str
+                                .toLowerCase()
+                                .normalize("NFD")
+                                .replace(/[\u0300-\u036f]/g, "");
+                        }
 
-			function translateErrorMessage(lang) {
-			  const errorDiv = document.querySelector('.error-msg');
-			  if (!errorDiv) return;
+                        function translateErrorMessage(lang) {
+                          const errorDiv = document.querySelector('.error-msg');
+                          if (!errorDiv) return;
 
-			  const original = normalize(errorDiv.textContent);
-			  const translations = ERROR_TRANSLATIONS[lang];
-			  if (!translations) return;
+                          const original = normalize(errorDiv.textContent);
+                          const translations = ERROR_TRANSLATIONS[lang];
+                          if (!translations) return;
 
-			  for (let key in translations) {
-				if (original.includes(normalize(key))) {
-				  errorDiv.textContent = translations[key];
-				  return;
-				}
-			  }
-			}
-		
-		
+                          for (let key in translations) {
+                                if (original.includes(normalize(key))) {
+                                  errorDiv.textContent = translations[key];
+                                  return;
+                                }
+                          }
+                        }
+                
+                
         function updateBackgrounds(lang) {
             const prefix = lang === 'fr' ? '' : lang + '-';
             const style = document.documentElement.style;
@@ -802,17 +814,224 @@ if (!sessionStorage.getItem("advertShown")) {
                 }
             });
         }
-		
-		// Apparition du bouton de secours après 10 secondes
-		setTimeout(() => {
-		const btn = document.getElementById('fallback-btn');
-		if (btn) {
-		btn.style.display = 'block';
-		// Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
-		setTimeout(() => { btn.style.opacity = '1'; }, 50);
-		}
-		}, 30000); // 10 000 ms = 10 secondes
-		
+                
+                // Apparition du bouton de secours après 10 secondes
+                setTimeout(() => {
+                const btn = document.getElementById('fallback-btn');
+                if (btn) {
+                btn.style.display = 'block';
+                // Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
+                setTimeout(() => { btn.style.opacity = '1'; }, 50);
+                }
+                }, 30000); // 10 000 ms = 10 secondes
+                
+    </script>
+
+    <!-- ═══ MVOLA PAYMENT MODAL ═══ -->
+    <div id="mvola-modal" class="mvola-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-plan-name">
+        <div class="mvola-modal-card">
+            <button type="button" class="mvola-close-btn" id="mvola-close" aria-label="Fermer">&times;</button>
+            <h3 class="mvola-modal-title">Finaliser l'achat</h3>
+            <div class="mvola-plan-summary">
+                <span class="mvola-plan-name" id="modal-plan-name"></span>
+                <span class="mvola-plan-price" id="modal-plan-price"></span>
+            </div>
+
+            <div id="mvola-methods-section">
+                <p class="mvola-choose-label">Choisissez votre mode de paiement</p>
+                <button type="button" class="mvola-method-btn" id="mvola-select-btn">
+                    <span class="mvola-badge">M</span>
+                    <span>MVola</span>
+                </button>
+            </div>
+
+            <div class="mvola-phone-section" id="mvola-phone-section" style="display:none">
+                <label for="mvola-phone" class="mvola-phone-label">Numéro MVola</label>
+                <input type="tel" id="mvola-phone" class="mvola-phone-input"
+                       placeholder="034 XX XXX XX" maxlength="13" inputmode="numeric" />
+                <div class="mvola-error-msg" id="mvola-error" style="display:none"></div>
+                <button type="button" class="mvola-pay-btn" id="mvola-pay-btn">
+                    <span class="mvola-btn-text">Payer maintenant</span>
+                    <span class="mvola-spinner" id="mvola-spinner" style="display:none"></span>
+                </button>
+                <p class="mvola-loading-msg" id="mvola-loading-msg" style="display:none">
+                    Traitement MVola en cours, veuillez patienter sur votre téléphone…
+                </p>
+                <button type="button" class="mvola-back-btn" id="mvola-back-btn">← Retour</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var currentPlan = null;
+
+            var modal          = document.getElementById('mvola-modal');
+            var closeBtn       = document.getElementById('mvola-close');
+            var methodsSection = document.getElementById('mvola-methods-section');
+            var mvolaSelectBtn = document.getElementById('mvola-select-btn');
+            var phoneSection   = document.getElementById('mvola-phone-section');
+            var phoneInput     = document.getElementById('mvola-phone');
+            var errorDiv       = document.getElementById('mvola-error');
+            var payBtn         = document.getElementById('mvola-pay-btn');
+            var payBtnText     = payBtn.querySelector('.mvola-btn-text');
+            var spinner        = document.getElementById('mvola-spinner');
+            var loadingMsg     = document.getElementById('mvola-loading-msg');
+            var backBtn        = document.getElementById('mvola-back-btn');
+            var planNameEl     = document.getElementById('modal-plan-name');
+            var planPriceEl    = document.getElementById('modal-plan-price');
+
+            function openMVolaModal(plan) {
+                currentPlan = plan;
+                planNameEl.textContent  = plan.name;
+                planPriceEl.textContent = plan.price;
+                resetModal();
+                modal.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.remove('is-open');
+                document.body.style.overflow = '';
+                currentPlan = null;
+            }
+
+            function resetModal() {
+                methodsSection.style.display = '';
+                phoneSection.style.display   = 'none';
+                hideError();
+                setLoading(false);
+                phoneInput.value = '';
+            }
+
+            function showPhoneStep() {
+                methodsSection.style.display = 'none';
+                phoneSection.style.display   = 'flex';
+                setTimeout(function () { phoneInput.focus(); }, 100);
+            }
+
+            function showError(msg) {
+                errorDiv.textContent    = msg;
+                errorDiv.style.display  = 'block';
+            }
+
+            function hideError() {
+                errorDiv.style.display = 'none';
+                errorDiv.textContent   = '';
+            }
+
+            function setLoading(isLoading) {
+                payBtn.disabled           = isLoading;
+                spinner.style.display     = isLoading ? 'block' : 'none';
+                payBtnText.textContent    = isLoading ? 'Traitement…' : 'Payer maintenant';
+                loadingMsg.style.display  = isLoading ? 'block' : 'none';
+                backBtn.style.display     = isLoading ? 'none' : 'block';
+                phoneInput.disabled       = isLoading;
+            }
+
+            function normalizePhone(raw) {
+                return raw.replace(/\D/g, '');
+            }
+
+            function isValidPhone(digits) {
+                return /^(032|033|034|038)\d{7}$/.test(digits);
+            }
+
+            async function submitPayment() {
+                hideError();
+
+                var rawPhone = phoneInput.value.trim();
+                var digits   = normalizePhone(rawPhone);
+
+                if (!isValidPhone(digits)) {
+                    showError('Numéro invalide. Entrez un numéro MVola valide (ex : 034 12 345 67).');
+                    phoneInput.focus();
+                    return;
+                }
+
+                if (!currentPlan) {
+                    showError('Aucun forfait sélectionné. Veuillez recommencer.');
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+                    var response = await fetch('https://wdt-api.onrender.com/api/hotspot/purchase', {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify({ phone: digits, plan: currentPlan.planId })
+                    });
+
+                    var data;
+                    try {
+                        data = await response.json();
+                    } catch (_) {
+                        data = {};
+                    }
+
+                    if (!response.ok) {
+                        var errMsg = (data && data.message)
+                            ? data.message
+                            : 'Le paiement a échoué (code ' + response.status + '). Veuillez réessayer.';
+                        throw new Error(errMsg);
+                    }
+
+                    if (!data.username || !data.password) {
+                        throw new Error('Réponse invalide du serveur. Contactez l\'administrateur.');
+                    }
+
+                    closeModal();
+
+                    // Bridge: inject credentials and trigger MikroTik login
+                    document.login.username.value = data.username;
+                    document.login.password.value = data.password;
+
+                    if (typeof doLogin === 'function') {
+                        doLogin();
+                    } else {
+                        document.login.submit();
+                    }
+
+                } catch (err) {
+                    setLoading(false);
+                    var message = (err && err.message)
+                        ? err.message
+                        : 'Erreur réseau. Vérifiez votre connexion et réessayez.';
+                    showError(message);
+                }
+            }
+
+            // Expose openMVolaModal globally so the price-card handler can call it
+            window.openMVolaModal = openMVolaModal;
+
+            // Event listeners
+            closeBtn.addEventListener('click', closeModal);
+
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeModal();
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+                    closeModal();
+                }
+            });
+
+            mvolaSelectBtn.addEventListener('click', showPhoneStep);
+
+            backBtn.addEventListener('click', function () {
+                methodsSection.style.display = '';
+                phoneSection.style.display   = 'none';
+                hideError();
+            });
+
+            payBtn.addEventListener('click', submitPayment);
+
+            phoneInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') submitPayment();
+            });
+        })();
     </script>
 
 </body>
