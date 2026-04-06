@@ -1,0 +1,40 @@
+2026-04-05T12:25:52.992391911Z ==> Downloading cache...
+2026-04-05T12:25:53.031077227Z ==> Cloning from https://github.com/Jeanberoad/WDT-API
+2026-04-05T12:25:53.370805545Z ==> Checking out commit e130d4b0e1372cef4c8e0964aef5b4da2b8093a6 in branch main
+2026-04-05T12:26:03.941361772Z ==> Downloaded 115MB in 4s. Extraction took 7s.
+2026-04-05T12:26:12.479354695Z ==> Using Node.js version 22.22.0 (default)
+2026-04-05T12:26:12.503630276Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2026-04-05T12:26:12.619570806Z ==> Running build command 'pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build'...
+2026-04-05T12:26:14.481735208Z 
+2026-04-05T12:26:14.481752899Z > @workspace/api-server@0.0.0 build /opt/render/project/src/artifacts/api-server
+2026-04-05T12:26:14.481758769Z > node ./build.mjs
+2026-04-05T12:26:14.481761619Z 
+2026-04-05T12:26:14.78272574Z 
+2026-04-05T12:26:14.78275142Z   dist/index.mjs                       1.8mb ⚠️
+2026-04-05T12:26:14.78275696Z   dist/pino-worker.mjs               153.4kb
+2026-04-05T12:26:14.78276072Z   dist/pino-file.mjs                 142.1kb
+2026-04-05T12:26:14.78276448Z   dist/pino-pretty.mjs               114.6kb
+2026-04-05T12:26:14.782768101Z   dist/thread-stream-worker.mjs        7.3kb
+2026-04-05T12:26:14.782771731Z   dist/index.mjs.map                   2.9mb
+2026-04-05T12:26:14.782775201Z   dist/pino-worker.mjs.map           256.9kb
+2026-04-05T12:26:14.782778681Z   dist/pino-file.mjs.map             229.0kb
+2026-04-05T12:26:14.782782301Z   dist/pino-pretty.mjs.map           203.9kb
+2026-04-05T12:26:14.782786291Z   dist/thread-stream-worker.mjs.map   12.0kb
+2026-04-05T12:26:14.782789651Z 
+2026-04-05T12:26:14.782794071Z ⚡ Done in 244ms
+2026-04-05T12:26:24.097694131Z ==> Uploading build...
+2026-04-05T12:26:32.912368243Z ==> Uploaded in 3.9s. Compression took 4.9s
+2026-04-05T12:26:32.940593234Z ==> Build successful 🎉
+2026-04-05T12:26:38.202605713Z ==> Deploying...
+2026-04-05T12:26:38.328894009Z ==> Setting WEB_CONCURRENCY=1 by default, based on available CPUs in the instance
+2026-04-05T12:26:57.084698778Z ==> Running 'node --enable-source-maps artifacts/api-server/dist/index.mjs'
+2026-04-05T12:26:58.476399318Z {"level":30,"time":1775392018474,"pid":69,"hostname":"srv-d7943bvpm1nc73cjip70-hibernate-6db47b49bd-fg7nl","port":10000,"msg":"Server listening"}
+2026-04-05T12:26:58.674485338Z {"level":30,"time":1775392018674,"pid":69,"hostname":"srv-d7943bvpm1nc73cjip70-hibernate-6db47b49bd-fg7nl","req":{"id":1,"method":"HEAD","url":"/"},"res":{"statusCode":404},"responseTime":5,"msg":"request completed"}
+2026-04-05T12:27:01.150230694Z ==> Your service is live 🎉
+2026-04-05T12:27:01.258953768Z {"level":30,"time":1775392021258,"pid":69,"hostname":"srv-d7943bvpm1nc73cjip70-hibernate-6db47b49bd-fg7nl","req":{"id":2,"method":"GET","url":"/"},"res":{"statusCode":404},"responseTime":1,"msg":"request completed"}
+2026-04-05T12:27:01.347159416Z ==> 
+2026-04-05T12:27:01.349475532Z ==> ///////////////////////////////////////////////////////////
+2026-04-05T12:27:01.351996869Z ==> 
+2026-04-05T12:27:01.354476194Z ==> Available at your primary URL https://wdt-api.onrender.com
+2026-04-05T12:27:01.356773329Z ==> 
+2026-04-05T12:27:01.361648244Z ==> ///////////////////////////////////////////////////////////

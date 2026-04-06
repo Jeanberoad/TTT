@@ -1,0 +1,229 @@
+	
+envStatus	
+MVOLA_CONSUMER_KEY	true
+MVOLA_CONSUMER_SECRET	true
+MVOLA_PARTNER_MSISDN	true
+tokenObtained	true
+winningVariant	"none — all failed"
+results	
+0	
+variant	"V1_numeric_refId_isoDate"
+success	false
+httpStatus	500
+mvolaResponse	
+errorCategory	"internal"
+errorCode	"genericError"
+errorDescription	"Generic Internal Error"
+errorDateTime	"2026-04-05T19:21:44.349Z"
+errorParameters	
+0	
+key	"mmErrorCode"
+value	"4002"
+payloadSent	
+amount	"500"
+currency	"Ar"
+descriptionText	"Hotspot ticket test"
+requestDate	"2026-04-05T16:21:34.073Z"
+requestingOrganisationTransactionReference	"5406094073"
+originalTransactionReference	""
+debitParty	
+0	
+key	"msisdn"
+value	"0349587674"
+creditParty	
+0	
+key	"msisdn"
+value	"0384604572"
+metadata	
+0	
+key	"partnerName"
+value	"HotspotPortal"
+1	
+key	"fc"
+value	"USD"
+2	
+key	"amountFc"
+value	"1"
+1	
+variant	"V2_no_originalTxnRef"
+success	false
+httpStatus	500
+mvolaResponse	
+errorCategory	"internal"
+errorCode	"genericError"
+errorDescription	"Generic Internal Error"
+errorDateTime	"2026-04-05T19:21:45.047Z"
+errorParameters	
+0	
+key	"mmErrorCode"
+value	"4002"
+payloadSent	
+amount	"500"
+currency	"Ar"
+descriptionText	"Hotspot ticket test"
+requestDate	"2026-04-05T16:21:34.073Z"
+requestingOrganisationTransactionReference	"5406094073"
+debitParty	
+0	
+key	"msisdn"
+value	"0349587674"
+creditParty	
+0	
+key	"msisdn"
+value	"0384604572"
+metadata	
+0	
+key	"partnerName"
+value	"HotspotPortal"
+1	
+key	"fc"
+value	"USD"
+2	
+key	"amountFc"
+value	"1"
+2	
+variant	"V3_empty_requestDate"
+success	false
+httpStatus	400
+mvolaResponse	
+errorCategory	"validation"
+errorCode	"formatError"
+errorDescription	"Missing field"
+errorDateTime	"2026-04-05T19:21:34.960"
+errorParameters	
+0	
+key	"mmErrorCode"
+value	"4001"
+payloadSent	
+amount	"500"
+currency	"Ar"
+descriptionText	"Hotspot ticket test"
+requestDate	""
+requestingOrganisationTransactionReference	"5406094073"
+originalTransactionReference	""
+debitParty	
+0	
+key	"msisdn"
+value	"0349587674"
+creditParty	
+0	
+key	"msisdn"
+value	"0384604572"
+metadata	
+0	
+key	"partnerName"
+value	"HotspotPortal"
+1	
+key	"fc"
+value	"USD"
+2	
+key	"amountFc"
+value	"1"
+3	
+variant	"V4_empty_txnRef"
+success	false
+httpStatus	400
+mvolaResponse	
+errorCategory	"validation"
+errorCode	"formatError"
+errorDescription	"Missing field"
+errorDateTime	"2026-04-05T19:21:34.927"
+errorParameters	
+0	
+key	"mmErrorCode"
+value	"4001"
+payloadSent	
+amount	"500"
+currency	"Ar"
+descriptionText	"Hotspot ticket test"
+requestDate	"2026-04-05T16:21:34.073Z"
+requestingOrganisationTransactionReference	""
+originalTransactionReference	""
+debitParty	
+0	
+key	"msisdn"
+value	"0349587674"
+creditParty	
+0	
+key	"msisdn"
+value	"0384604572"
+metadata	
+0	
+key	"partnerName"
+value	"HotspotPortal"
+1	
+key	"fc"
+value	"USD"
+2	
+key	"amountFc"
+value	"1"
+4	
+variant	"V5_country_code_msisdn"
+success	false
+httpStatus	500
+mvolaResponse	
+errorCategory	"internal"
+errorCode	"genericError"
+errorDescription	"Generic Internal Error"
+errorDateTime	"2026-04-05T19:21:45.042Z"
+errorParameters	
+0	
+key	"mmErrorCode"
+value	"4002"
+payloadSent	
+amount	"500"
+currency	"Ar"
+descriptionText	"Hotspot ticket test"
+requestDate	"2026-04-05T16:21:34.073Z"
+requestingOrganisationTransactionReference	"5406094073"
+originalTransactionReference	""
+debitParty	
+0	
+key	"msisdn"
+value	"261349587674"
+creditParty	
+0	
+key	"msisdn"
+value	"261384604572"
+metadata	
+0	
+key	"partnerName"
+value	"HotspotPortal"
+1	
+key	"fc"
+value	"USD"
+2	
+key	"amountFc"
+value	"1"
+5	
+variant	"V6_minimal_metadata"
+success	false
+httpStatus	500
+mvolaResponse	
+errorCategory	"internal"
+errorCode	"genericError"
+errorDescription	"Generic Internal Error"
+errorDateTime	"2026-04-05T19:21:45.005Z"
+errorParameters	
+0	
+key	"mmErrorCode"
+value	"4002"
+payloadSent	
+amount	"500"
+currency	"Ar"
+descriptionText	"Hotspot ticket test"
+requestDate	"2026-04-05T16:21:34.073Z"
+requestingOrganisationTransactionReference	"5406094073"
+originalTransactionReference	""
+debitParty	
+0	
+key	"msisdn"
+value	"0349587674"
+creditParty	
+0	
+key	"msisdn"
+value	"0384604572"
+metadata	
+0	
+key	"partnerName"
+value	"HotspotPortal"

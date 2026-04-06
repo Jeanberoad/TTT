@@ -1,54 +1,56 @@
-# WiFi De Tsararano - Captive Portal
+# Workspace
 
 ## Overview
-A custom captive portal for MikroTik hotspots, designed for a WiFi service called "WiFi De Tsararano" (Madagascar). It provides a multilingual (French, Malagasy, English) login interface with time-based theming.
 
-## Tech Stack
-- **Frontend:** Pure HTML5, CSS3, Vanilla JavaScript
-- **Server (dev):** Python `http.server` via `serve.py`
-- **Libraries:** html5-qrcode.min.js (QR scanning), md5.js (CHAP auth)
+pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
 
-## Project Layout
-- `login.html` — Main login page
-- `status.html` — Session info after login
-- `logout.html` — Logout confirmation
-- `radvert.html` — Advertisement/landing page
-- `alogin.html`, `redirect.html`, `rlogin.html` — Login flow pages
-- `GameOverSoon.html` — Session expiry warning
-- `css/style.css` — Main stylesheet
-- `js/theme.js` — Time-based theme switching
-- `img/` — Background images for each time-of-day theme
-- `old/` — Legacy browser-compatible versions
-- `xml/` — WISP XML compatibility files
-- `serve.py` — Local development server (port 5000)
+## Stack
 
-## Development
-The app is served with Python's built-in HTTP server:
+- **Monorepo tool**: pnpm workspaces
+- **Node.js version**: 24
+- **Package manager**: pnpm
+- **TypeScript version**: 5.9
+- **API framework**: Express 5
+- **Database**: PostgreSQL + Drizzle ORM
+- **Validation**: Zod (`zod/v4`), `drizzle-zod`
+- **API codegen**: Orval (from OpenAPI spec)
+- **Build**: esbuild (CJS bundle)
+
+## Key Commands
+
+- `pnpm run typecheck` — full typecheck across all packages
+- `pnpm run build` — typecheck + build all packages
+- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
+- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/api-server run dev` — run API server locally
+
+See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Hotspot Middleware
+
+A captive-portal payment middleware is implemented in the API server under:
+
+- `artifacts/api-server/src/routes/hotspot.ts` — Express route handler
+- `artifacts/api-server/src/lib/mvola.ts` — MVola payment helper
+- `artifacts/api-server/src/lib/mikrotik.ts` — MikroTik RouterOS hotspot user creator
+
+### Endpoint
+
+`POST /api/hotspot/purchase`
+
+**Body (JSON):**
+- `phone` — customer's MVola phone number (e.g. `"0340000000"`)
+- `amount` — ticket price in Ariary
+- `profile` — MikroTik hotspot profile name (e.g. `"1h"`, `"1day"`)
+- `uptime` *(optional)* — MikroTik `limit-uptime` value (e.g. `"01:00:00"`)
+
+**Response (200):**
+```json
+{ "username": "hs-XXXXXX", "password": "...", "transactionId": "..." }
 ```
-python serve.py
-```
-Runs on `0.0.0.0:5000`.
 
-## Deployment
-Configured as a **static** deployment — files are served directly with no backend processing needed.
-
-## MVola Payment Integration
-When a user clicks a price card, a payment modal appears instead of directly filling the username field. The modal flow:
-1. Shows the selected plan (name + price)
-2. User selects MVola as payment method
-3. User enters their MVola phone number (032/033/034/038 format)
-4. A POST request is sent to `https://wdt-api.onrender.com/api/hotspot/purchase` with `{ phone, plan }`
-5. On success, the API returns `{ username, password }` which are injected into `document.login` and `doLogin()` is called to authenticate via MikroTik CHAP
-6. Full error handling for network failures, invalid phone numbers, and API errors
-7. Clear loading state ("Traitement MVola en cours…") to prevent double-clicks
-
-**MikroTik Walled Garden required** — add these entries so the API is reachable before login:
-```
-/ip hotspot walled-garden
-add dst-host=wdt-api.onrender.com
-add dst-host=*.mvola.mg
-```
-
-## Notes
-- MikroTik RouterOS variables (`$(chap-id)`, `$(link-login-only)`, etc.) are used in HTML templates and only work when deployed to a MikroTik router's flash/hotspot directory.
-- The `old/` directory contains simplified versions for legacy device compatibility.
+### Required Secrets
+- `MVOLA_TEST_KEY` — MVola test API bearer token
+- `MIKROTIK_IP` — public IP / hostname of the MikroTik router
+- `MIKROTIK_USER` — MikroTik API username
+- `MIKROTIK_PASS` — MikroTik API password

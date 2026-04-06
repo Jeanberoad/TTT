@@ -1,0 +1,42 @@
+Crée un middleware basique en Node.js utilisant le framework Express. Ce middleware servira de pont entre un portail captif WiFi, l'API de paiement mobile MVola, et l'API d'un routeur MikroTik RouterOS.
+
+    Objectif du flux :
+
+        Le middleware reçoit une requête HTTP POST depuis la page de login du portail captif lorsqu'un client veut acheter un ticket.
+
+        Le middleware contacte l'API de test MVola pour initier et valider le paiement.
+
+        Si le paiement est un succès, le middleware se connecte à l'API du routeur MikroTik et exécute une commande pour créer un nouvel utilisateur (ticket hotspot) avec une durée spécifique.
+
+        Le middleware renvoie les identifiants générés au portail captif en format JSON.
+
+    Contraintes de sécurité et d'environnement (TRÈS IMPORTANT) :
+    Le code ne doit contenir AUCUN mot de passe ou clé d'API en dur. Utilise strictement process.env pour récupérer les informations suivantes qui seront configurées dans les "Secrets" de Replit :
+
+        MVOLA_TEST_KEY : Le token d'authentification pour l'API MVola.
+
+        MIKROTIK_IP : L'adresse IP publique ou l'URL du routeur MikroTik.
+
+        MIKROTIK_USER : Le nom d'utilisateur API (ex: api-middleware).
+
+        MIKROTIK_PASS : Le mot de passe de l'utilisateur API MikroTik.
+
+    Spécifications techniques :
+
+        Utilise axios pour faire les requêtes HTTP vers l'API MVola.
+
+        Utilise une bibliothèque adaptée pour communiquer avec le MikroTik (comme node-routeros ou routeros-client).
+
+        Garde la logique de validation de paiement très simple pour ce test initial (simule ou fais un appel basique à l'API MVola).
+
+        Ajoute des console.log clairs à chaque étape (Réception, Appel MVola, Appel MikroTik) pour faciliter le débogage dans la console Replit.
+
+        Structure le code dans un seul fichier index.js pour faciliter le premier test.
+
+Comment procéder sur Replit une fois le code généré :
+
+    Les Secrets (Variables d'environnement) : Avant de lancer le code, cherche l'outil "Secrets" (souvent représenté par une icône de cadenas) dans le menu de gauche de Replit.
+
+    Ajoute tes valeurs : C'est là que tu vas créer les clés (MVOLA_TEST_KEY, MIKROTIK_USER, etc.) et coller tes vrais mots de passe et tokens dans les champs "Value".
+
+    Lancement : Replit s'occupera d'injecter ces secrets de manière invisible quand tu cliqueras sur "Run".

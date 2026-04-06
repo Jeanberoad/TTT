@@ -1,0 +1,36 @@
+Nous allons ajouter un tableau de bord d'administration web à notre serveur Express existant. Ce tableau de bord servira d'interface graphique pour interagir avec une API de gestion des utilisateurs externe hébergée sur https://cxm-d2hn.onrender.com/. Il est impératif de ne pas modifier ou casser la route /api/hotspot/purchase déjà en place.
+
+Objectif :
+
+    Créer une interface web (HTML/CSS/JS frontend) accessible sur la route /admin.
+
+    L'interface doit avoir un design très minimaliste, "chic", strictement en noir et blanc, facile à lire sur ordinateur et mobile.
+
+    Le backend Express doit servir de "proxy" vers l'API Render pour protéger la clé d'administration.
+
+Configuration Backend (Proxy Express) :
+
+    Ajoute une nouvelle variable d'environnement RENDER_ADMIN_KEY (qui sera configurée dans les Secrets).
+
+    Crée des routes API intermédiaires sur Express (ex: /api/admin/status, /api/admin/keys, /api/admin/logs) qui feront des requêtes HTTP (avec axios ou fetch) vers https://cxm-d2hn.onrender.com/ en injectant automatiquement ?key=RENDER_ADMIN_KEY dans l'URL.
+
+    Protège l'accès à la route /admin et aux routes proxy par une authentification basique simple (Basic Auth) ou un mot de passe stocké dans une variable d'environnement DASHBOARD_PASS pour que personne d'autre ne puisse voir cette page.
+
+Fonctionnalités du Frontend (Tableau de bord) :
+L'interface web doit faire appel aux routes proxy d'Express pour afficher :
+
+    Vue d'ensemble : Afficher le statut actuel (données de la route /status de Render) : sessions actives, limites, etc.
+
+    Gestion des clés : Un tableau listant tous les utilisateurs (données de /keys), avec la possibilité de voir leur rôle et leur statut.
+
+    Création : Un petit formulaire permettant de créer un nouvel utilisateur (appel vers /admin/key/create sur Render avec name et custom_key).
+
+    Logs : Un tableau affichant les dernières activités (données de /logs).
+
+Contraintes :
+
+    Ne stocke aucune clé en dur. Utilise process.env.RENDER_ADMIN_KEY et process.env.DASHBOARD_PASS.
+
+    Mets le code frontend (HTML/JS) dans un dossier public ou sers-le proprement via Express.
+
+    Assure-toi que les appels vers l'API Render gèrent bien les erreurs (si le service Render est en veille ou lent).
