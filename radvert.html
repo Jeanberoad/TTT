@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="-1">
+
+<title>WiFi De Tsararano</title>
+
+<link rel="stylesheet" href="css/style.css">
+<script src="theme.js"></script>
+
+<style>
+
+body, html{
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:transparent;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.wrap{
+    text-align:center;
+    width:100%;
+    padding-top:50px;
+}
+
+/* Titre */
+
+h1{
+    font-size:3.2em;
+    font-weight:700;
+    letter-spacing:2px;
+    margin-bottom:30px;
+
+    color:#ffffff;
+
+    text-shadow:
+        0 0 10px rgba(138,43,226,0.6),
+        0 0 20px rgba(0,206,209,0.5),
+        0 0 40px rgba(0,206,209,0.3);
+
+    animation:titleReveal 1.2s ease-out;
+}
+
+@keyframes titleReveal{
+    0%{
+        opacity:0;
+        transform:translateY(-25px) scale(0.9);
+        filter:blur(8px);
+    }
+    100%{
+        opacity:1;
+        transform:translateY(0) scale(1);
+        filter:blur(0);
+    }
+}
+
+/* Image pub */
+
+img.pub{
+    width:92%;
+    max-height:75vh;
+    object-fit:cover;
+    border-radius:22px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.25);
+    margin-top:15px;
+}
+
+/* Countdown */
+
+.countdown{
+    margin-top:25px;
+    font-size:20px;
+    font-weight:600;
+    color:white;
+
+    text-shadow:
+        0 0 10px rgba(0,206,209,0.8),
+        0 0 20px rgba(138,43,226,0.6);
+
+    animation:pulse 1s infinite alternate;
+}
+
+#timer{
+    font-size:34px;
+    font-weight:bold;
+    color:#3283e6;
+}
+
+@keyframes pulse{
+    from{opacity:0.6;}
+    to{opacity:1;}
+}
+
+/* Bouton connexion */
+
+.btn-login{
+
+    display:none;
+
+    margin-top:35px;
+    padding:14px 30px;
+
+    font-size:18px;
+    font-weight:600;
+
+    text-decoration:none;
+    color:white;
+
+    border-radius:30px;
+
+    background:linear-gradient(135deg,#00CED1,#8A2BE2);
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,0.3),
+        0 0 10px rgba(0,206,209,0.5);
+
+    transition:all .3s ease;
+}
+
+.btn-login:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.35),
+        0 0 15px rgba(138,43,226,0.8);
+}
+
+/* --- LE PETIT BOUTON POUR VIEUX APPAREILS (CORRIGÉ) --- */
+.Gbtn-old {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 14px; /* Un peu plus large pour être plus cliquable */
+    
+    /* Fond noir à 60% d'opacité : visible sur blanc ET sur noir */
+    background: rgba(0, 0, 0, 0.6); 
+    
+    /* Texte blanc pur pour le contraste */
+    color: #ffffff; 
+    
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: bold;
+    
+    /* Bordure fine pour bien délimiter le bouton */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    
+    /* Optionnel : transition pour le survol */
+    transition: background 0.3s;
+}
+
+.Gbtn-old:hover {
+    /* Devient un peu plus opaque au survol */
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+}
+
+/* Mobile */
+
+@media(max-width:600px){
+
+    h1{
+        font-size:2.2em;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="wrap">
+
+<h1>WiFi De Tsararano</h1>
+
+<img src="pub.jpeg" alt="Publicité" class="pub">
+
+<div class="countdown">
+<span id="timer">9</span>
+</div>
+
+<a href="login.html" class="btn-login">
+Se connecter
+</a>
+
+</div>
+
+<a href="old/login.html" class="Gbtn-old">Basique</a>
+
+<script>
+
+let time = 9;
+
+let timer = document.getElementById("timer");
+
+let btn = document.querySelector(".btn-login");
+
+let countdown = setInterval(function(){
+
+    time--;
+
+    timer.textContent = time;
+
+    /* bouton visible après 3 secondes */
+
+    if(time === 6){
+
+        btn.style.display = "inline-block";
+
+    }
+
+    /* redirection */
+
+    if(time === 0){
+
+        clearInterval(countdown);
+
+        window.location.href = "login.html";
+
+    }
+
+},1000);
+
+</script>
+
+</body>
+</html>
