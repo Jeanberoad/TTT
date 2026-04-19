@@ -9,6 +9,19 @@
 <link rel="stylesheet" href="css/style.css">
     <script src="theme.js"></script>
 <script>
+    (function() {
+        var isLowPerf = false;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) isLowPerf = true;
+        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) isLowPerf = true;
+        if (navigator.deviceMemory && navigator.deviceMemory <= 2) isLowPerf = true;
+        if (isLowPerf) {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.add('low-performance');
+            });
+        }
+    })();
+</script>
+<script>
 $(if advert-pending == 'yes')
     var popup = '';
     function focusAdvert() {
@@ -51,6 +64,7 @@ $(endif)
                 <tr><td>Statut</td><td><a href="$(link-advert)" target="hotspot_advert" style="color:var(--accent-secondary)">Publicité requise</a></td></tr>
             $(endif)
             </table>
+            <input type="submit" class="btn-submit" value="Se déconnecter" style="margin-top: 16px;">
         </form>
         
         <p class="footer-text" style="margin-top: 20px;">Actualisation automatique toutes les 5s</p>

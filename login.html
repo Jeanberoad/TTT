@@ -15,17 +15,29 @@ if (!sessionStorage.getItem("advertShown")) {
     <title>WiFi De Tsararano - Connexion</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="theme.js"></script>
+    <script>
+        (function() {
+            var isLowPerf = false;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) isLowPerf = true;
+            if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2) isLowPerf = true;
+            if (navigator.deviceMemory && navigator.deviceMemory <= 2) isLowPerf = true;
+            if (isLowPerf) {
+                document.documentElement.classList.add('low-performance');
+                window.IS_LOW_PERFORMANCE = true;
+            }
+        })();
+    </script>
 </head>
 
-<a href="old/login.html" class="btn-old" id="fallback-btn" style="display: none; opacity: 0;">Basique</a>
-
 <body>
+
+<a href="old/login.html" class="btn-old" id="fallback-btn" style="display: none; opacity: 0;">Basique</a>
 
     $(if chap-id)
     <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
         <input type="hidden" name="username" />
         <input type="hidden" name="password" />
-        <input type="hidden" name="dst" value="https://fr.pornhub.com/view_video.php?viewkey=69b7af059d512" />
+        <input type="hidden" name="dst" value="$(link-orig)" />
         <input type="hidden" name="popup" value="true" />
     </form>
 
@@ -65,17 +77,17 @@ if (!sessionStorage.getItem("advertShown")) {
         <div class="error-msg">
             $(error)
         </div>
-		$(endif)
+                $(endif)
 
-		$(if error == "")
-			$(if trial == 'yes')
-			<div class="error-msg" style="background: rgba(0, 206, 209, 0.1); color: var(--accent-secondary); border-color: rgba(0, 206, 209, 0.2);">
-				<a href="$(link-login-only)?dst=$(link-orig-esc)&amp;username=T-$(mac-esc)" class="trial-link">
-					Essai gratuit disponible, cliquez ici.
-				</a>
-			</div>
-			$(endif)
-		$(endif)
+                $(if error == "")
+                        $(if trial == 'yes')
+                        <div class="error-msg" style="background: rgba(0, 206, 209, 0.1); color: var(--accent-secondary); border-color: rgba(0, 206, 209, 0.2);">
+                                <a href="$(link-login-only)?dst=$(link-orig-esc)&amp;username=T-$(mac-esc)" class="trial-link">
+                                        Essai gratuit disponible, cliquez ici.
+                                </a>
+                        </div>
+                        $(endif)
+                $(endif)
 
         <form name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()" $(endif)>
             <input type="hidden" name="dst" value="$(link-orig)" />
@@ -197,7 +209,11 @@ if (!sessionStorage.getItem("advertShown")) {
 
             function resetScannerUI() {
                 reader.style.display = 'none';
-                setScanBtnLabel('Scanner QR Code');
+                const lang = localStorage.getItem('hotspot_lang') || 'fr';
+                const label = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang] && TRANSLATIONS[lang].scan)
+                    ? TRANSLATIONS[lang].scan
+                    : 'Scanner QR Code';
+                setScanBtnLabel(label);
             }
 
             async function safeStopQr() {
@@ -227,25 +243,41 @@ if (!sessionStorage.getItem("advertShown")) {
                 stopScanner();
             }
 
+            function getScanError(key) {
+                const lang = localStorage.getItem('hotspot_lang') || 'fr';
+                const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : null;
+                return (t && t.scanErrors && t.scanErrors[key]) ? t.scanErrors[key]
+                    : (TRANSLATIONS && TRANSLATIONS.fr && TRANSLATIONS.fr.scanErrors && TRANSLATIONS.fr.scanErrors[key]) ? TRANSLATIONS.fr.scanErrors[key]
+                    : '';
+            }
+
+            function getScanLabel(key) {
+                const lang = localStorage.getItem('hotspot_lang') || 'fr';
+                const t = (typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[lang]) ? TRANSLATIONS[lang] : null;
+                return (t && t[key]) ? t[key]
+                    : (TRANSLATIONS && TRANSLATIONS.fr && TRANSLATIONS.fr[key]) ? TRANSLATIONS.fr[key]
+                    : '';
+            }
+
             async function startScanner() {
                 hideError();
 
                 // Security / capability checks
                 if (!window.isSecureContext) {
-                    showError("Le scan caméra nécessite une connexion sécurisée. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.");
+                    showError(getScanError('notSecure'));
                     resetScannerUI();
                     return;
                 }
 
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    showError("L'accès à la caméra n'est pas supporté ici. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.");
+                    showError(getScanError('notSupported'));
                     resetScannerUI();
                     return;
                 }
 
                 reader.style.display = 'block';
                 isStarting = true;
-                setScanBtnLabel('Démarrage…');
+                setScanBtnLabel(getScanLabel('scanStarting'));
 
                 try {
                     // Probe camera access first, then STOP the test stream to avoid locking the camera
@@ -276,25 +308,25 @@ if (!sessionStorage.getItem("advertShown")) {
 
                     clearStartTimeout();
                     isStarting = false;
-                    setScanBtnLabel('Annuler le scan');
+                    setScanBtnLabel(getScanLabel('scanCancel'));
                 } catch (err) {
                     clearStartTimeout();
                     isStarting = false;
 
-                    let errorMsg = "Erreur d'accès à la caméra.";
+                    let errorMsg = getScanError('generic');
 
                     if (err && err.name === 'StartTimeout') {
-                        errorMsg = "Le démarrage du scanner prend trop de temps. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.";
+                        errorMsg = getScanError('timeout');
                     } else if (err && err.name === 'NotAllowedError') {
-                        errorMsg = "Accès à la caméra refusé ou indisponible ici. Utilisez “Copier le lien” puis ouvrez-le dans votre navigateur.";
+                        errorMsg = getScanError('notAllowed');
                     } else if (err && err.name === 'NotFoundError') {
-                        errorMsg = "Aucune caméra détectée.";
+                        errorMsg = getScanError('notFound');
                     } else if (err && err.name === 'NotReadableError') {
-                        errorMsg = "Caméra occupée par une autre application.";
+                        errorMsg = getScanError('notReadable');
                     } else if (err && err.name === 'OverconstrainedError') {
-                        errorMsg = "Caméra arrière indisponible, essayez une autre caméra.";
+                        errorMsg = getScanError('overconstrained');
                     }
-					
+                                        
 
                     showError(errorMsg);
                     await safeStopQr();
@@ -437,50 +469,50 @@ if (!sessionStorage.getItem("advertShown")) {
     </section>
 
     <script>
-			const ERROR_TRANSLATIONS = {
-			  fr: {
-				"invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
-				"no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
-				"has reached uptime limit": "Votre temps de connexion est épuisé.",
-				"has reached traffic limit": "Votre forfait internet est épuisé.",
-				"not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
-				"web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
-				"radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
-				"already authorizing": "Connexion déjà en cours, veuillez patienter.",
-				"cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
-				"you are not logged in": "Vous n’êtes pas connecté."
-			  },
+                        const ERROR_TRANSLATIONS = {
+                          fr: {
+                                "invalid username or password": "Nom d'utilisateur ou mot de passe invalide.",
+                                "no more sessions are allowed": "Ce compte est déjà utilisé sur un autre appareil.",
+                                "has reached uptime limit": "Votre temps de connexion est épuisé.",
+                                "has reached traffic limit": "Votre forfait internet est épuisé.",
+                                "not allowed to log in from this mac": "Ce compte n’est pas autorisé sur cet appareil.",
+                                "web browser did not send challenge": "Erreur de sécurité. Actualisez la page et réessayez.",
+                                "radius server is not responding": "Serveur d’authentification indisponible. Réessayez plus tard.",
+                                "already authorizing": "Connexion déjà en cours, veuillez patienter.",
+                                "cannot assign ip address": "Réseau saturé, aucune adresse IP disponible.",
+                                "you are not logged in": "Vous n’êtes pas connecté."
+                          },
 
-			  mg: {
-				"invalid username or password": "Diso ny anarana na ny teny miafina.",
-				"no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
-				"has reached uptime limit": "Efa tampitra ny fehim-potoana.",
-				"has reached traffic limit": "Lany ny data-nao.",
-				"not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
-				"web browser did not send challenge": "Misy olana kely, avereno indray.",
-				"radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
-				"already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
-				"cannot assign ip address": "Feno ny tambazotra.",
-				"you are not logged in": "Tsy tafiditra ianao."
-			  },
+                          mg: {
+                                "invalid username or password": "Diso ny anarana na ny teny miafina.",
+                                "no more sessions are allowed": "Efa ampiasaina amin’ny fitaovana hafa ity kaonty ity.",
+                                "has reached uptime limit": "Efa tampitra ny fehim-potoana.",
+                                "has reached traffic limit": "Lany ny data-nao.",
+                                "not allowed to log in from this mac": "Ilay fitaovana nampiasainao voalohany ihany no mety.",
+                                "web browser did not send challenge": "Misy olana kely, avereno indray.",
+                                "radius server is not responding": "Tsy mamaly ny serveur, andramo afaka kelikely.",
+                                "already authorizing": "Mbola mandeha ny fidirana, miandrasa kely azafady.",
+                                "cannot assign ip address": "Feno ny tambazotra.",
+                                "you are not logged in": "Tsy tafiditra ianao."
+                          },
 
-			  en: {
-				"invalid username or password": "Invalid username or password.",
-				"no more sessions are allowed": "This account is already in use.",
-				"has reached uptime limit": "Your time limit has been reached.",
-				"has reached traffic limit": "Your data limit has been reached.",
-				"not allowed to log in from this mac": "This account is not allowed on this device.",
-				"web browser did not send challenge": "Security error. Please refresh and try again.",
-				"radius server is not responding": "Authentication server is not responding.",
-				"already authorizing": "Authorization in progress. Please wait.",
-				"cannot assign ip address": "Network is full. No IP available.",
-				"you are not logged in": "You are not logged in."
-			  }
-			};
-			
+                          en: {
+                                "invalid username or password": "Invalid username or password.",
+                                "no more sessions are allowed": "This account is already in use.",
+                                "has reached uptime limit": "Your time limit has been reached.",
+                                "has reached traffic limit": "Your data limit has been reached.",
+                                "not allowed to log in from this mac": "This account is not allowed on this device.",
+                                "web browser did not send challenge": "Security error. Please refresh and try again.",
+                                "radius server is not responding": "Authentication server is not responding.",
+                                "already authorizing": "Authorization in progress. Please wait.",
+                                "cannot assign ip address": "Network is full. No IP available.",
+                                "you are not logged in": "You are not logged in."
+                          }
+                        };
+                        
         const TRANSLATIONS = {
             fr: {
-			    fallback: "Basique",
+                            fallback: "Basique",
                 title: "WiFi De Tsararano",
                 subtitle: "à votre service",
                 username: "Nom d'utilisateur",
@@ -495,10 +527,23 @@ if (!sessionStorage.getItem("advertShown")) {
                 tutorialTitle: "Comment ça marche ?",
                 tutorialSubtitle: "Regardez ce court tutoriel pour vous connecter facilement",
                 muteLabel: "Activer le son",
-                unmuteLabel: "Couper le son"
+                unmuteLabel: "Couper le son",
+                trial: "Essai gratuit disponible, cliquez ici.",
+                scanStarting: "Démarrage…",
+                scanCancel: "Annuler le scan",
+                scanErrors: {
+                    notSecure: "Le scan caméra nécessite une connexion sécurisée. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.",
+                    notSupported: "L\u2019accès à la caméra n\u2019est pas supporté ici. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.",
+                    timeout: "Le démarrage du scanner prend trop de temps. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.",
+                    notAllowed: "Accès à la caméra refusé ou indisponible ici. Utilisez \u201cCopier le lien\u201d puis ouvrez-le dans votre navigateur.",
+                    notFound: "Aucune caméra détectée.",
+                    notReadable: "Caméra occupée par une autre application.",
+                    overconstrained: "Caméra arrière indisponible, essayez une autre caméra.",
+                    generic: "Erreur d\u2019accès à la caméra."
+                }
             },
             mg: {
-			    fallback: "Tsotra",
+                            fallback: "Tsotra",
                 title: "WiFi De Tsararano",
                 subtitle: "nenao, nenakay, nentsika jiaby !",
                 username: "Anarana",
@@ -513,10 +558,23 @@ if (!sessionStorage.getItem("advertShown")) {
                 tutorialTitle: "Liana ve ianao?",
                 tutorialSubtitle: "Jereo ity sarimihetsika ity fa hanampy anao",
                 muteLabel: "Misy feony",
-                unmuteLabel: "WC"
+                unmuteLabel: "WC",
+                trial: "Tsindrio ity raha te anandrana.",
+                scanStarting: "NDAO ARY…",
+                scanCancel: "Hajanona",
+                scanErrors: {
+                    notSecure: "Any anaty navigateur ihany no mandé ny scan. Ampiasao ny \u201cKopieo\u201d ary sokafy ao amin\u2019ny navigateur.",
+                    notSupported: "Tsy mety mandeha kamera eto. Ampiasao ny \u201cKopieo\u201d ary sokafy ao amin\u2019ny navigateur.",
+                    timeout: "Ela loatra ny fanombohana ny scanner. Ampiasao ny \u201cKopieo\u201d ary sokafy ao amin\u2019ny navigateur.",
+                    notAllowed: "Voarara ny fidirana amin\u2019ny kamera. Ampiasao ny \u201cKopieo\u201d ary sokafy ao amin\u2019ny navigateur.",
+                    notFound: "Tsy hita ny kamera.",
+                    notReadable: "Misy application hafa mampiasa ny kamera\u2019nao.",
+                    overconstrained: "Tsy mety mandeha ny kamera aoriana, andramo ny eo aloha raha mety.",
+                    generic: "Olana amin\u2019ny fidirana amin\u2019ny kamera."
+                }
             },
             en: {
-			    fallback: "Basic",
+                            fallback: "Basic",
                 title: "WiFi De Tsararano",
                 subtitle: "Stay Connected",
                 username: "Username",
@@ -531,7 +589,20 @@ if (!sessionStorage.getItem("advertShown")) {
                 tutorialTitle: "How it works?",
                 tutorialSubtitle: "Watch this short tutorial to connect easily",
                 muteLabel: "Turn on sound",
-                unmuteLabel: "Mute sound"
+                unmuteLabel: "Mute sound",
+                trial: "Free trial available, click here.",
+                scanStarting: "Starting\u2026",
+                scanCancel: "Cancel scan",
+                scanErrors: {
+                    notSecure: "Camera scan requires a secure connection. Use \u201cCopy link\u201d then open it in your browser.",
+                    notSupported: "Camera access is not supported here. Use \u201cCopy link\u201d then open it in your browser.",
+                    timeout: "Scanner is taking too long to start. Use \u201cCopy link\u201d then open it in your browser.",
+                    notAllowed: "Camera access denied or unavailable. Use \u201cCopy link\u201d then open it in your browser.",
+                    notFound: "No camera detected.",
+                    notReadable: "Camera is in use by another application.",
+                    overconstrained: "Rear camera unavailable, try another camera.",
+                    generic: "Camera access error."
+                }
             }
         };
 
@@ -547,11 +618,11 @@ if (!sessionStorage.getItem("advertShown")) {
             // Header
             document.querySelector('.header h1').textContent = t.title;
             document.querySelector('.header p').textContent = t.subtitle;
-			// Mise à jour du texte du bouton de secours
-			const fallbackBtn = document.getElementById('fallback-btn');
-			if (fallbackBtn) {
-			fallbackBtn.textContent = t.fallback;
-			}
+                        // Mise à jour du texte du bouton de secours
+                        const fallbackBtn = document.getElementById('fallback-btn');
+                        if (fallbackBtn) {
+                        fallbackBtn.textContent = t.fallback;
+                        }
             // Form
             document.querySelector('input[name="username"]').placeholder = t.username;
             document.querySelector('input[name="password"]').placeholder = t.password;
@@ -569,6 +640,10 @@ if (!sessionStorage.getItem("advertShown")) {
             const priceCards = document.querySelectorAll('.price-card');
             priceCards[0].querySelector('.price-time').textContent = t.month;
             priceCards[1].querySelector('.price-time').textContent = t.day;
+
+            // Trial link (shown only when MikroTik injects it)
+            const trialLink = document.querySelector('.trial-link');
+            if (trialLink) trialLink.textContent = t.trial || trialLink.textContent;
 
             // Tutorial
             document.querySelector('.tutorial-title').textContent = t.tutorialTitle;
@@ -599,36 +674,34 @@ if (!sessionStorage.getItem("advertShown")) {
             // Update theme prefixes indirectly by telling theme.js if needed, 
             // but we'll override the background logic here to support prefixes.
             updateBackgrounds(lang);
-			
-			translateErrorMessage(lang);
-    
-            localStorage.setItem('hotspot_lang', lang);
+
+            translateErrorMessage(lang);
         }
         
-			function normalize(str) {
-			  return str
-				.toLowerCase()
-				.normalize("NFD")
-				.replace(/[\u0300-\u036f]/g, "");
-			}
+                        function normalize(str) {
+                          return str
+                                .toLowerCase()
+                                .normalize("NFD")
+                                .replace(/[\u0300-\u036f]/g, "");
+                        }
 
-			function translateErrorMessage(lang) {
-			  const errorDiv = document.querySelector('.error-msg');
-			  if (!errorDiv) return;
+                        function translateErrorMessage(lang) {
+                          const errorDiv = document.querySelector('.error-msg');
+                          if (!errorDiv) return;
 
-			  const original = normalize(errorDiv.textContent);
-			  const translations = ERROR_TRANSLATIONS[lang];
-			  if (!translations) return;
+                          const original = normalize(errorDiv.textContent);
+                          const translations = ERROR_TRANSLATIONS[lang];
+                          if (!translations) return;
 
-			  for (let key in translations) {
-				if (original.includes(normalize(key))) {
-				  errorDiv.textContent = translations[key];
-				  return;
-				}
-			  }
-			}
-		
-		
+                          for (let key in translations) {
+                                if (original.includes(normalize(key))) {
+                                  errorDiv.textContent = translations[key];
+                                  return;
+                                }
+                          }
+                        }
+                
+                
         function updateBackgrounds(lang) {
             const prefix = lang === 'fr' ? '' : lang + '-';
             const style = document.documentElement.style;
@@ -804,17 +877,17 @@ if (!sessionStorage.getItem("advertShown")) {
                 }
             });
         }
-		
-		// Apparition du bouton de secours après 10 secondes
-		setTimeout(() => {
-		const btn = document.getElementById('fallback-btn');
-		if (btn) {
-		btn.style.display = 'block';
-		// Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
-		setTimeout(() => { btn.style.opacity = '1'; }, 50);
-		}
-		}, 30000); // 10 000 ms = 10 secondes
-		
+                
+                // Apparition du bouton de secours après 10 secondes
+                setTimeout(() => {
+                const btn = document.getElementById('fallback-btn');
+                if (btn) {
+                btn.style.display = 'block';
+                // Petit délai pour laisser le temps au display:block de s'activer avant l'opacité
+                setTimeout(() => { btn.style.opacity = '1'; }, 50);
+                }
+                }, 30000); // 30 000 ms = 30 secondes
+                
     </script>
 
 </body>
